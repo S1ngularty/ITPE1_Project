@@ -16,7 +16,7 @@ function Login() {
       .post(`${import.meta.env.VITE_APP_API}api/v1/login`, credentials)
       .then((response) => {
         localStorage.setItem("token", response.data.token);
-        navigate("/");
+        navigate("/home");
       })
       .catch((err) => {
         setError(err.response?.data?.message || "Login failed. Please try again.");

@@ -17,9 +17,18 @@ function Navbar() {
       </div>
 
       <div className="navbar-links">
-        <Link to="/" className="navbar-link">Home</Link>
-        <Link to="/about" className="navbar-link">About</Link>
-        <Link to="/dashboard" className="navbar-link">Dashboard</Link>
+        <Link to="/" className="navbar-link">
+          Home
+        </Link>
+        <Link to="/dashboard" className="navbar-link">
+          Dashboard
+        </Link>
+        <Link to="/dashboard" className="navbar-link">
+          Profile
+        </Link>
+        <Link to="/about" className="navbar-link">
+          About
+        </Link>
       </div>
 
       <button className="navbar-button" onClick={handleLogout}>
