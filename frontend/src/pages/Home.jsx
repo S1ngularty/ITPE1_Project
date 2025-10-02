@@ -4,10 +4,10 @@ import "../styles/pages/Home.css";
 
 function Home() {
   const navigate = useNavigate();
-  const userName = "John Doe"; // TODO: Replace with actual logged-in user data
+  const userName = "Levi Asher"; // TODO: Replace with actual logged-in user data
 
   function handleUpload() {
-    alert("Upload functionality coming soon!");
+    navigate("../upload-page");
   }
 
   function handleViewSaved() {

@@ -26,6 +26,15 @@ exports.getUser = async (req, res) => {
   }
 };
 
+exports.createUser = async (req, res) => {
+  try {
+    const result = await userService.createUser(req.body);
+    return res.status(200).json({ success: true, result });
+  } catch (error) {
+    return res.status(500).json(error.message);
+  }
+};
+
 exports.update = async (req, res) => {
   try {
     const result = await userService.update(req.user, req.body);

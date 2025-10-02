@@ -15,6 +15,13 @@ exports.getUser = async (param) => {
   return user;
 };
 
+exports.createUser = async (body) => {
+  const { name, email, password } = body;
+  const createdUser = await User.create({ name, email, password });
+  if (!createdUser) throw new error("failed to create the user");
+  return createdUser;
+};
+
 exports.update = async (user, body) => {
   const { userId } = user;
   const { name, email } = body;

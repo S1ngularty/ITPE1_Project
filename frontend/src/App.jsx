@@ -5,6 +5,8 @@ import { getToken } from "./utils/authUtil";
 
 import Navbar from "./components/layouts/Navbar";
 import Login from "./pages/auth/login";
+import Register from "./pages/auth/register";
+import UploadPage from "./pages/UploadPage";
 import PrivateRoute from "./PrivateRoute";
 import Home from "./pages/Home";
 
@@ -14,14 +16,23 @@ function App() {
   return (
     <>
       <Router>
-        {getToken() && <Navbar/>}
+        {getToken() && <Navbar />}
         <Routes>
           <Route path="/login" element={<Login />}></Route>
+          <Route path="/register" element={<Register />}></Route>
           <Route
             path="/home"
             element={
               <PrivateRoute redirectedTo={"/login"}>
                 <Home></Home>
+              </PrivateRoute>
+            }
+          ></Route>
+          <Route
+            path="/upload-page"
+            element={
+              <PrivateRoute redirectedTo={"/login"}>
+                <UploadPage></UploadPage>
               </PrivateRoute>
             }
           ></Route>
