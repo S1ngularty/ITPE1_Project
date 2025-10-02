@@ -10,6 +10,7 @@ import UploadPage from "./pages/UploadPage";
 import PrivateRoute from "./PrivateRoute";
 import Home from "./pages/Home";
 import SavedAnalyses from "./pages/savedAnalysesPage";
+import Profile from "./pages/Profle";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -29,11 +30,19 @@ function App() {
               </PrivateRoute>
             }
           ></Route>
-           <Route
+          <Route
             path="/save-analyses"
             element={
               <PrivateRoute redirectedTo={"/login"}>
                 <SavedAnalyses></SavedAnalyses>
+              </PrivateRoute>
+            }
+          ></Route>
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute redirectedTo={"/login"}>
+                <Profile></Profile>
               </PrivateRoute>
             }
           ></Route>

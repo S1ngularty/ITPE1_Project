@@ -23,7 +23,7 @@ function Navbar() {
         <Link to="#" className="navbar-link">
           Dashboard
         </Link>
-        <Link to="#" className="navbar-link">
+        <Link to="/profile" className="navbar-link">
           Profile
         </Link>
         <Link to="/save-analyses" className="navbar-link">
