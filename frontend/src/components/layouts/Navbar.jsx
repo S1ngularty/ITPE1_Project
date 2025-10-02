@@ -26,8 +26,8 @@ function Navbar() {
         <Link to="#" className="navbar-link">
           Profile
         </Link>
-        <Link to="#" className="navbar-link">
-          About
+        <Link to="/save-analyses" className="navbar-link">
+          Save Analyses
         </Link>
       </div>
 
