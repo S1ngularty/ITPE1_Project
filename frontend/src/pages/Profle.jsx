@@ -70,6 +70,20 @@ function Profile() {
       setMessage("Passwords do not match.");
       return;
     }
+    axios
+      .patch(
+        `${import.meta.env.VITE_APP_API}api/v1/user/updatePassword`,
+        {
+          password: formData.password,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
+      .then((response) => fetchProfile())
+      .catch((error) => console.log(error));
     setMessage("Password updated successfully (placeholder).");
   }
 

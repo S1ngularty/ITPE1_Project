@@ -40,10 +40,10 @@ exports.update = async (user, body) => {
 
 exports.updatePassword = async (userInfo, body) => {
   const { userId } = userInfo;
-  const { newPassword } = body;
+  const { password } = body;
   const user = await User.findById(userId).exec();
   if (!user) throw new Error("user not found");
-  if (newPassword) user.password = newPassword.trim();
+  if (password) user.password = password.trim();
   await user.save();
   return user;
 };
