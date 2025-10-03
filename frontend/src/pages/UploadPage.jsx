@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import "../styles/pages/UploadPage.css";
 
 function UploadPage() {
@@ -9,7 +10,7 @@ function UploadPage() {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState([]);
 
-  // Dummy history (last uploads)
+  // Dummy history (static for now, later can come from DB)
   const history = [
     { id: 1, name: "screw_01.png" },
     { id: 2, name: "hole_02.jpg" },
@@ -24,27 +25,38 @@ function UploadPage() {
     }
   }
 
-  function handleAnalyze() {
+  async function handleAnalyze() {
     if (!selectedFile) {
       alert("Please upload an image first!");
       return;
     }
     setLoading(true);
 
-    // Placeholder analysis simulation
-    setTimeout(() => {
-      setResults([
-        { id: 1, type: "Screw Detected", detail: "3 screws identified" },
-        { id: 2, type: "Holes Detected", detail: "2 holes identified" },
-        { id: 3, type: "Suggestions", detail: "2 compatible screws found" },
-      ]);
+    const formData = new FormData();
+    formData.append("image", selectedFile); // must match backend multer field
+
+    try {
+      const res = await axios.post(`${import.meta.env.VITE_APP_API}api/v1/analyze`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      const data = res.data;
+
+      // Convert backend JSON into cards
+    setResults([
+  { id: 1, type: "Screw Length", detail: `${data.screw_length_px} px` },
+  { id: 2, type: "Screw Width", detail: `${data.screw_width_px} px` },
+]);
+    } catch (err) {
+      console.error("Error analyzing image:", err);
+      alert("Failed to analyze image. Check backend and Python service.");
+    } finally {
       setLoading(false);
-    }, 2000);
+    }
   }
 
   return (
     <div className="upload-page">
-
       {/* Main Content */}
       <main className="upload-main">
         <div className="upload-section">
@@ -75,7 +87,7 @@ function UploadPage() {
             disabled={loading}
             className="analyze-btn"
           >
-            {loading ? "Analyzing..." : "Upload Image"}
+            {loading ? "Analyzing..." : "Upload & Analyze"}
           </button>
 
           {/* Results */}
