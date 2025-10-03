@@ -10,8 +10,8 @@ function Profile() {
 
   // Placeholder user data
   const [formData, setFormData] = useState({
-    name: "John Doe",
-    email: "john@example.com",
+    name: "",
+    email: "",
     password: "",
     confirmPassword: "",
   });
@@ -34,10 +34,9 @@ function Profile() {
   useEffect(() => {
     fetchProfile();
   }, []);
-//    useEffect(() => {
-//     console.log(formData)
-//   }, [formData]);
-  
+  //    useEffect(() => {
+  //     console.log(formData)
+  //   }, [formData]);
 
   const [message, setMessage] = useState("");
 
@@ -48,7 +47,21 @@ function Profile() {
 
   function handleSaveProfile(e) {
     e.preventDefault();
-    setMessage("Profile info updated successfully (placeholder).");
+    axios
+      .post(
+        `${import.meta.env.VITE_APP_API}api/v1/user`,
+        {
+          name: formData.name,
+          email: formData.email,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
+      .then((response) => fetchProfile())
+      .catch((error) => console.log(error.message));
   }
 
   function handleSavePassword(e) {
