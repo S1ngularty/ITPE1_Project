@@ -2,35 +2,48 @@ const express = require("express");
 const multer = require("multer");
 const fs = require("fs");
 const axios = require("axios");
-const FormData = require("form-data");
 
 const upload = multer({ dest: "tmp_uploads/" });
 const router = express.Router();
 
-// API route that accepts image from frontend
 router.post("/analyze", upload.single("image"), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ success: false, error: "No file uploaded" });
     }
 
-    // Prepare form data to send to Python
-    const form = new FormData();
-    form.append("file", fs.createReadStream(req.file.path));
+    // Read uploaded file as base64
+    const imageBase64 = fs.readFileSync(req.file.path, { encoding: "base64" });
 
-    // Send to Python service
-    const pyResponse = await axios.post("http://127.0.0.1:5001/analyze", form, {
-      headers: form.getHeaders(),
+    // Roboflow serverless endpoint
+    const url = "https://serverless.roboflow.com/screw-kuuzp/2";
+    const apiKey = "YxFc6R5mRsUrSOBqrF0S"; // <-- put your key in .env
+
+    const response = await axios({
+      method: "POST",
+      url,
+      params: { api_key: apiKey,
+         confidence: 0.2   // 👈 filter out predictions below 50% confidence
+       },
+      data: imageBase64,
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      }
     });
 
-    // Delete temp file after sending
-    fs.unlinkSync(req.file.path);
+    // Clean up tmp file
+    fs.unlink(req.file.path, () => {});
 
-    // Send Python’s result back to frontend
-    res.json(pyResponse.data);
+    return res.json({
+      success: true,
+      predictions: response.data.predictions || [],
+    });
   } catch (err) {
-    console.error("Error communicating with ML service:", err.message);
-    res.status(500).json({ success: false, error: "ML service error" });
+    console.error("Error communicating with Roboflow:", err.response?.data || err.message);
+    res.status(500).json({
+      success: false,
+      error: err.response?.data || err.message,
+    });
   }
 });
 
