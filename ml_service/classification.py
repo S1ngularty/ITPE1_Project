@@ -1,13 +1,71 @@
+import cv2
+import numpy as np
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 from ultralytics import YOLO
 
-# Load your trained model
-model = YOLO("best.pt")  # path to your downloaded weights
+# Load your trained YOLO classification model
+model = YOLO("best.pt")  # update path if needed
 
-# Run prediction on an image
-results = model.predict("C:/Users/levi/Documents/Datasets/Screw datasets/IMG_20251004_213213_226.jpg")  # replace with your image path
+app = Flask(__name__)
+CORS(app)
 
-# Print results
-for r in results:
-    probs = r.probs  # classification probabilities
-    print("Predicted class:", model.names[probs.top1])  # class name
-    print("Confidence:", probs.top1conf.item())  # confidence score
+@app.route("/classify", methods=["POST"])
+def analyze_image():
+    if "file" not in request.files:
+        return jsonify({"success": False, "error": "No file uploaded"}), 400
+
+    file = request.files["file"]
+    npimg = np.frombuffer(file.read(), np.uint8)
+    img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
+
+    if img is None:
+        return jsonify({"success": False, "error": "Invalid image"}), 400
+
+    # ---------- 1. Run YOLO Classification ----------
+    results = model.predict(img, verbose=False)  # pass image directly
+    pred_class = None
+    pred_conf = None
+
+    if results and results[0].probs is not None:
+        probs = results[0].probs
+        pred_class = model.names[probs.top1]
+        pred_conf = float(probs.top1conf.item())
+
+    # ---------- 2. Contour Analysis for Dimensions ----------
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    blur = cv2.GaussianBlur(gray, (5, 5), 0)
+    _, thresh = cv2.threshold(blur, 60, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+
+    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    screw_length_px = None
+    screw_width_px = None
+
+    if contours:
+        cnt = max(contours, key=cv2.contourArea)
+        x, y, w, h = cv2.boundingRect(cnt)
+        screw_length_px = max(w, h)
+        screw_width_px = min(w, h)
+
+    # ---------- 3. Return Merged JSON ----------
+    return jsonify({
+        "success": True,
+        "classification": {
+            "predicted_class": pred_class,
+            "confidence": pred_conf
+        },
+        "dimensions": {
+            "image_width": img.shape[1],
+            "image_height": img.shape[0],
+            "screw_length_px": screw_length_px,
+            "screw_width_px": screw_width_px
+        }
+    })
+
+@app.route("/health", methods=["GET"])
+def health_check():
+    return jsonify({"status": "Python service running"})
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5001)
