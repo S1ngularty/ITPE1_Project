@@ -8,8 +8,8 @@ function UploadPage() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState([]);
-  const [mode, setMode] = useState("classification"); // "classification" | "counting"
+  const [results, setResults] = useState(null);
+  const [mode, setMode] = useState("classify"); // "classify" | "count"
 
   // Dummy history (static for now, later can come from DB)
   const history = [
@@ -32,7 +32,7 @@ function UploadPage() {
       return;
     }
     setLoading(true);
-    setResults([]);
+    setResults(null);
 
     const formData = new FormData();
     formData.append("image", selectedFile); // must match backend multer field
@@ -54,12 +54,10 @@ function UploadPage() {
       if (mode === "classify") {
         setResults(data);
       } else if (mode === "count") {
-        setResults(
-          {
-            type: "Screw Count",
-            count: `${data.predictions.length || 0} screws detected`,
-          },
-        );
+        setResults({
+          type: "Screw Count",
+          count: `${data.predictions?.length || 0} screws detected`,
+        });
       }
     } catch (err) {
       console.error(
@@ -167,7 +165,7 @@ function UploadPage() {
               <h2>Analysis Results</h2>
               {results && (
                 <div className="results-badge">
-                  {mode === "classify" ? "classify" : "count"}
+                  {mode === "classify" ? "classification" : "counting"}
                 </div>
               )}
             </div>
@@ -183,58 +181,107 @@ function UploadPage() {
               <div className="results-content">
                 {mode === "classify" ? (
                   <>
+                    {/* Screw Name Classification */}
                     <div className="result-card primary">
                       <div className="card-icon">🏷️</div>
                       <div className="card-content">
-                        <h4>Screw Name</h4>
+                        <h4>Screw Type</h4>
                         <p className="result-value">
-                          {results.screw_name_classification?.predicted_class || "Unknown"}
+                          {results.classificationData?.predicted_classes?.[0] || "Unknown"}
                         </p>
-                        <div className="confidence-bar">
-                          <div className="confidence-fill" style={{
-                            width: `${(results.screw_name_classification?.confidence || 0) * 100}%`
-                          }}></div>
-                        </div>
-                        <p className="confidence-text">
-                          Confidence: {((results.screw_name_classification?.confidence || 0) * 100).toFixed(1)}%
-                        </p>
+                        {results.classificationData?.predictions && (
+                          <>
+                            <div className="confidence-bar">
+                              <div className="confidence-fill" style={{
+                                width: `${(Object.values(results.classificationData.predictions)[0]?.confidence || 0) * 100}%`
+                              }}></div>
+                            </div>
+                            <p className="confidence-text">
+                              Confidence: {((Object.values(results.classificationData.predictions)[0]?.confidence || 0) * 100).toFixed(1)}%
+                            </p>
+                          </>
+                        )}
                       </div>
                     </div>
 
+                    {/* Screw Head Type */}
                     <div className="result-card secondary">
                       <div className="card-icon">🔩</div>
                       <div className="card-content">
                         <h4>Screw Head Type</h4>
                         <p className="result-value">
-                          {results.screw_head_classification?.predicted_classes
-                            ? results.screw_head_classification.predicted_classes.join(", ")
-                            : "Not detected"}
+                          {results.screw_head_classification?.predicted_classes?.[0] || "Not detected"}
                         </p>
+                        {results.screw_head_classification?.predictions && (
+                          <>
+                            <div className="confidence-bar">
+                              <div className="confidence-fill" style={{
+                                width: `${(Object.values(results.screw_head_classification.predictions)[0]?.confidence || 0) * 100}%`
+                              }}></div>
+                            </div>
+                            <p className="confidence-text">
+                              Confidence: {((Object.values(results.screw_head_classification.predictions)[0]?.confidence || 0) * 100).toFixed(1)}%
+                            </p>
+                          </>
+                        )}
                       </div>
                     </div>
 
+                    {/* Dimensions */}
                     <div className="result-card tertiary">
                       <div className="card-icon">📐</div>
                       <div className="card-content">
-                        <h4>Dimensions</h4>
+                        <h4>Image Dimensions</h4>
                         <div className="dimensions-grid">
-                          <div className="dimension-item">
-                            <span className="dimension-label">Length</span>
-                            <span className="dimension-value">
-                              {results.screw_dimensions?.screw_length_px || 0}px
-                            </span>
-                          </div>
                           <div className="dimension-item">
                             <span className="dimension-label">Width</span>
                             <span className="dimension-value">
-                              {results.screw_dimensions?.screw_width_px || 0}px
+                              {results.classificationData?.image?.width || 0}px
+                            </span>
+                          </div>
+                          <div className="dimension-item">
+                            <span className="dimension-label">Height</span>
+                            <span className="dimension-value">
+                              {results.classificationData?.image?.height || 0}px
                             </span>
                           </div>
                           <div className="dimension-item full-width">
-                            <span className="dimension-label">Image Size</span>
+                            <span className="dimension-label">Processing Time</span>
                             <span className="dimension-value">
-                              {results.screw_dimensions?.image_width || 0} × {results.screw_dimensions?.image_height || 0}px
+                              {((results.classificationData?.time || 0) + (results.screw_head_classification?.time || 0)).toFixed(2)}s
                             </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* All Predictions */}
+                    <div className="result-card tertiary">
+                      <div className="card-icon">📊</div>
+                      <div className="card-content">
+                        <h4>All Predictions</h4>
+                        <div className="predictions-list">
+                          <div className="prediction-category">
+                            <h5>Screw Types:</h5>
+                            {results.classificationData?.predictions && Object.entries(results.classificationData.predictions).map(([name, data]) => (
+                              <div key={name} className="prediction-item">
+                                <span className="prediction-name">{name}</span>
+                                <span className="prediction-confidence">
+                                  {(data.confidence * 100).toFixed(1)}%
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                          <div className="prediction-category">
+                            <h5>Head Types:</h5>
+                            {results.screw_head_classification?.predictions && Object.entries(results.screw_head_classification.predictions).map(([name, data]) => (
+                              <div key={name} className="prediction-item">
+                                <span className="prediction-name">{name}</span>
+                                <span className="prediction-confidence">
+                                  {(data.confidence * 100).toFixed(1)}%
+                                </span>
+                              </div>
+                            ))}
                           </div>
                         </div>
                       </div>
@@ -246,7 +293,7 @@ function UploadPage() {
                     <div className="card-content">
                       <h4>Screw Count</h4>
                       <p className="result-count">
-                        {results.count || 0} screws detected
+                        {results.count || "0 screws detected"}
                       </p>
                       <p className="result-description">
                         Total number of screws identified in the image

@@ -54,7 +54,6 @@ router.post("/count", upload.single("image"), async (req, res) => {
   }
 });
 
-
 // ----------------- NEW Classification Route -----------------
 router.post("/classify", upload.single("image"), async (req, res) => {
   if (!req.file) {
@@ -62,39 +61,52 @@ router.post("/classify", upload.single("image"), async (req, res) => {
   }
 
   try {
-    // Prepare FormData for Flask YOLOv8 service
+    // Prepare FormData for first Roboflow detection model (screw name/type)
     const formData = new FormData();
     formData.append("file", fs.createReadStream(req.file.path));
 
-    // Prepare base64 for Roboflow API
+    // Prepare base64 for second Roboflow model (screw head classification)
     const imageBase64 = fs.readFileSync(req.file.path, { encoding: "base64" });
 
     // Send both requests in parallel
-    const [flaskResponse, roboflowResponse] = await Promise.all([
-      // 1️⃣ YOLOv8 Flask service for screw name/type
-      axios.post("http://localhost:5001/classify", formData, {
-        headers: formData.getHeaders(),
-      }),
+    const [screwNameResponse, screwHeadResponse] = await Promise.all([
+      // 1️⃣ Roboflow detection model for screw name/type
+      axios.post(
+        "https://detect.roboflow.com/screw_classify-tnjdl/1",
+        formData,
+        {
+          headers: {
+            ...formData.getHeaders(),
+          },
+          params: {
+            api_key: process.env.ROBOFLOW_API_KEY || "YxFc6R5mRsUrSOBqrF0S",
+          },
+        }
+      ),
 
       // 2️⃣ Roboflow hosted model for screw head type
       axios({
         method: "POST",
         url: "https://serverless.roboflow.com/screw-classification-xu5uf/1",
-        params: { api_key: process.env.ROBOFLOW_API_KEY || "YxFc6R5mRsUrSOBqrF0S" },
+        params: {
+          api_key: process.env.ROBOFLOW_API_KEY || "YxFc6R5mRsUrSOBqrF0S",
+        },
         data: imageBase64,
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
       }),
     ]);
+    console.log(screwNameResponse.data);
 
     // Clean up temp file
     fs.unlink(req.file.path, () => {});
-
-    // Merge results
+    // Extract screw name prediction
+    const classificationData = screwNameResponse.data;
+  
+    // Return merged results
     return res.json({
       success: true,
-      screw_name_classification: flaskResponse.data.classification || {},
-      screw_dimensions: flaskResponse.data.dimensions || {},
-      screw_head_classification: roboflowResponse.data
+      classificationData,
+      screw_head_classification: screwHeadResponse.data || {},
     });
   } catch (err) {
     console.error("Error in /classify:", err.response?.data || err.message);
@@ -103,6 +115,36 @@ router.post("/classify", upload.single("image"), async (req, res) => {
       success: false,
       error: err.response?.data || err.message,
     });
+  }
+});
+
+router.post("/roboflow-classify", upload.single("image"), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ success: false, error: "No file uploaded" });
+  }
+
+  try {
+    const formData = new FormData();
+    formData.append("file", fs.createReadStream(req.file.path));
+
+    const roboflowResponse = await axios.post(
+      "https://detect.roboflow.com/screw_classify-tnjdl/1",
+      formData,
+      {
+        headers: {
+          ...formData.getHeaders(), // important for multipart
+        },
+        params: {
+          api_key: "YxFc6R5mRsUrSOBqrF0S", // your Roboflow API key
+        },
+      }
+    );
+
+    fs.unlink(req.file.path, () => {}); // delete temp file
+    return res.json({ success: true, result: roboflowResponse.data });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ success: false, error: err.message });
   }
 });
 
