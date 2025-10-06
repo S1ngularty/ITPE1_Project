@@ -72,7 +72,7 @@ router.post("/classify", upload.single("image"), async (req, res) => {
     const [screwNameResponse, screwHeadResponse] = await Promise.all([
       // 1️⃣ Roboflow detection model for screw name/type
       axios.post(
-        "https://detect.roboflow.com/screw_classify-tnjdl/1",
+        "https://serverless.roboflow.com/screw_classify-tnjdl/8",
         formData,
         {
           headers: {
