@@ -4,7 +4,7 @@ const streamifier = require("streamifier");
 exports.uploadToCloudinary = async (fileBuffer) => {
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
-      { folder: "react-shop" },
+      { folder: "Screws" },
       (err, result) => {
         if (err) return reject(err);
         return resolve(result);
