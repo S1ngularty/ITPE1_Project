@@ -70,6 +70,115 @@ function UploadPage() {
     }
   }
 
+  // Helper function to render screw details from the result data
+  const renderScrewDetails = (resultData) => {
+    if (!resultData?.success || !resultData.result) {
+      return (
+        <div className="result-card error">
+          <div className="card-icon">❌</div>
+          <div className="card-content">
+            <h4>No Data Available</h4>
+            <p>Could not retrieve screw details from the analysis.</p>
+          </div>
+        </div>
+      );
+    }
+
+    const screw = resultData.result;
+
+    return (
+      <>
+        {/* Screw Name & Category */}
+        <div className="result-card primary">
+          <div className="card-icon">🏷️</div>
+          <div className="card-content">
+            <h4>Screw Identification</h4>
+            <div className="screw-basic-info">
+              <div className="screw-name">{screw.name || "Unknown Screw"}</div>
+              <div className="screw-category">{screw.category || "No category"}</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Specifications */}
+        <div className="result-card secondary">
+          <div className="card-icon">📋</div>
+          <div className="card-content">
+            <h4>Specifications</h4>
+            <div className="specs-grid">
+              <div className="spec-item">
+                <span className="spec-label">Sizes</span>
+                <span className="spec-value">
+                  {screw.sizes?.join(", ") || "Not specified"}
+                </span>
+              </div>
+              <div className="spec-item">
+                <span className="spec-label">Material </span>
+                <span className="spec-value">{screw.material || "Not specified"}</span>
+              </div>
+              <div className="spec-item">
+                <span className="spec-label">Strength</span>
+                <span className="spec-value">{screw.strength || "Not specified"}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Description */}
+        <div className="result-card tertiary">
+          <div className="card-icon">📝</div>
+          <div className="card-content">
+            <h4>Description</h4>
+            <p className="description-text">
+              {screw.description || "No description available."}
+            </p>
+            {screw.usage && (
+              <>
+                <h5>Usage:</h5>
+                <p className="usage-text">{screw.usage}</p>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Images */}
+        {screw.images && screw.images.length > 0 && (
+          <div className="result-card tertiary">
+            <div className="card-icon">🖼️</div>
+            <div className="card-content">
+              <h4>Reference Images</h4>
+              <div className="images-grid">
+                {screw.images.map((image, index) => (
+                  <div key={image._id || index} className="image-item">
+                    <img src={image.url} alt={`${screw.name} reference ${index + 1}`} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Additional Technical Details */}
+        <div className="result-card tertiary">
+          <div className="card-icon">🔧</div>
+          <div className="card-content">
+            <h4>Technical Details</h4>
+            <div className="technical-details">
+              <div className="detail-item">
+                <span className="detail-label">ID</span>
+                <span className="detail-value">{screw._id || "N/A"}</span>
+              </div>
+              <div className="detail-item">
+                <span className="detail-label">Database Version</span>
+                <span className="detail-value">{screw.__v || "0"}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  };
+
   return (
     <div className="upload-page">
 
@@ -180,113 +289,7 @@ function UploadPage() {
             {results && !loading && (
               <div className="results-content">
                 {mode === "classify" ? (
-                  <>
-                    {/* Screw Name Classification */}
-                    <div className="result-card primary">
-                      <div className="card-icon">🏷️</div>
-                      <div className="card-content">
-                        <h4>Screw Type</h4>
-                        <p className="result-value">
-                          {results.classificationData?.predicted_classes?.[0] || "Unknown"}
-                        </p>
-                        {results.classificationData?.predictions && (
-                          <>
-                            <div className="confidence-bar">
-                              <div className="confidence-fill" style={{
-                                width: `${(Object.values(results.classificationData.predictions)[0]?.confidence || 0) * 100}%`
-                              }}></div>
-                            </div>
-                            <p className="confidence-text">
-                              Confidence: {((Object.values(results.classificationData.predictions)[0]?.confidence || 0) * 100).toFixed(1)}%
-                            </p>
-                          </>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Screw Head Type */}
-                    <div className="result-card secondary">
-                      <div className="card-icon">🔩</div>
-                      <div className="card-content">
-                        <h4>Screw Head Type</h4>
-                        <p className="result-value">
-                          {results.screw_head_classification?.predicted_classes?.[0] || "Not detected"}
-                        </p>
-                        {results.screw_head_classification?.predictions && (
-                          <>
-                            <div className="confidence-bar">
-                              <div className="confidence-fill" style={{
-                                width: `${(Object.values(results.screw_head_classification.predictions)[0]?.confidence || 0) * 100}%`
-                              }}></div>
-                            </div>
-                            <p className="confidence-text">
-                              Confidence: {((Object.values(results.screw_head_classification.predictions)[0]?.confidence || 0) * 100).toFixed(1)}%
-                            </p>
-                          </>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Dimensions */}
-                    <div className="result-card tertiary">
-                      <div className="card-icon">📐</div>
-                      <div className="card-content">
-                        <h4>Image Dimensions</h4>
-                        <div className="dimensions-grid">
-                          <div className="dimension-item">
-                            <span className="dimension-label">Width</span>
-                            <span className="dimension-value">
-                              {results.classificationData?.image?.width || 0}px
-                            </span>
-                          </div>
-                          <div className="dimension-item">
-                            <span className="dimension-label">Height</span>
-                            <span className="dimension-value">
-                              {results.classificationData?.image?.height || 0}px
-                            </span>
-                          </div>
-                          <div className="dimension-item full-width">
-                            <span className="dimension-label">Processing Time</span>
-                            <span className="dimension-value">
-                              {((results.classificationData?.time || 0) + (results.screw_head_classification?.time || 0)).toFixed(2)}s
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* All Predictions */}
-                    <div className="result-card tertiary">
-                      <div className="card-icon">📊</div>
-                      <div className="card-content">
-                        <h4>All Predictions</h4>
-                        <div className="predictions-list">
-                          <div className="prediction-category">
-                            <h5>Screw Types:</h5>
-                            {results.classificationData?.predictions && Object.entries(results.classificationData.predictions).map(([name, data]) => (
-                              <div key={name} className="prediction-item">
-                                <span className="prediction-name">{name}</span>
-                                <span className="prediction-confidence">
-                                  {(data.confidence * 100).toFixed(1)}%
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                          <div className="prediction-category">
-                            <h5>Head Types:</h5>
-                            {results.screw_head_classification?.predictions && Object.entries(results.screw_head_classification.predictions).map(([name, data]) => (
-                              <div key={name} className="prediction-item">
-                                <span className="prediction-name">{name}</span>
-                                <span className="prediction-confidence">
-                                  {(data.confidence * 100).toFixed(1)}%
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </>
+                  renderScrewDetails(results)
                 ) : (
                   <div className="result-card primary">
                     <div className="card-icon">🔢</div>

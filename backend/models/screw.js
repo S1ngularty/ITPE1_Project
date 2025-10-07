@@ -9,7 +9,7 @@ const screwSchema = new mongoose.Schema({
   category: {
     type:String,
     default: "Machine Screw",
-    enum: ["Wood Screw", "Machine Screw", "Structural Fastener"],
+    enum: ["Wood Screw", "Machine Screw", "Structural Fastener","Anchor Screw"],
   },
   sizes: {
     type: Array,
