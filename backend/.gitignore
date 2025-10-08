@@ -1,4 +1,3 @@
 node_modules/
-.env
+/config/.env
 tmp_uploads/
-screwit-474108-36b39512822d.json
