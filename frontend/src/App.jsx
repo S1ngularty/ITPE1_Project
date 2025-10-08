@@ -9,7 +9,7 @@ import Register from "./pages/auth/register";
 import UploadPage from "./pages/UploadPage";
 import PrivateRoute from "./PrivateRoute";
 import Home from "./pages/Home";
-import SavedAnalyses from "./pages/savedAnalysesPage";
+import SavedAnalyses from "./pages/SavedAnalysesPage.jsx";
 import Profile from "./pages/Profle";
 
 function App() {

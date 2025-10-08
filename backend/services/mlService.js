@@ -22,15 +22,14 @@ const classify = async (request) => {
         ...formData.getHeaders(),
       },
       params: {
-        api_key: process.env.API_KEY,
+        api_key: process.env.ROBOFLOW_API_KEY,
       },
     }
   );
-  console.log(screwData.data);
   fs.unlink(request.file.path, () => {});
 
   const toFetchDocument = screwData.data.predicted_classes[0];
-  console.log("here ", toFetchDocument);
+  // console.log("here ", toFetchDocument);
 
   const screwDocument = await Screw.find({
     name: toFetchDocument,
@@ -53,7 +52,7 @@ const count = async (request) => {
         "Content-Type": "application/x-www-form-urlencoded",
       },
       params: {
-        api_key: "YxFc6R5mRsUrSOBqrF0S",
+        api_key: process.env.ROBOFLOW_API_KEY,
         confidence: 0.2,
       },
     }

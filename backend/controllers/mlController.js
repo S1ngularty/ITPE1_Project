@@ -22,6 +22,7 @@ const ml_count = async (req, res) => {
 const ml_classify = async (req, res) => {
   try {
     const result = await mlService.classify(req);
+    // console.log(result)
     return res.status(200).json({ success: true, result });
   } catch (error) {
     console.log(error.message);
