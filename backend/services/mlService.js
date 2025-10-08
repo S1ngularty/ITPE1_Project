@@ -22,7 +22,7 @@ const classify = async (request) => {
         ...formData.getHeaders(),
       },
       params: {
-        api_key: process.env.ROBOFLOW_API_KEY || "YxFc6R5mRsUrSOBqrF0S",
+        api_key: process.env.API_KEY,
       },
     }
   );
@@ -40,6 +40,30 @@ const classify = async (request) => {
   return screwDocument[0];
 };
 
-const count = (image) => {};
+const count = async (request) => {
+  if (!request.file) throw new Error("No Uploaded file");
+  const imageBase64 = fs.readFileSync(request.file.path, {
+    encoding: "base64",
+  });
+  const response = await axios.post(
+    "https://serverless.roboflow.com/screw-kuuzp/2",
+    imageBase64,
+    {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      params: {
+        api_key: "YxFc6R5mRsUrSOBqrF0S",
+        confidence: 0.2,
+      },
+    }
+  );
+
+  fs.unlink(request.file.path, () => {});
+
+  if (!response) throw new Error("object doesnt exist");
+
+  return response;
+};
 
 module.exports = { classify, count };
