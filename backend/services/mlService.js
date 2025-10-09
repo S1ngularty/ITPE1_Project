@@ -1,4 +1,5 @@
 const Screw = require("../models/screw");
+const UserActivity = require("../models/userActivity")
 const multer = require("multer");
 const fs = require("fs");
 const axios = require("axios");
@@ -57,7 +58,7 @@ const count = async (request) => {
       },
     }
   );
-
+  console.log(response.data)
   fs.unlink(request.file.path, () => {});
 
   if (!response) throw new Error("object doesnt exist");

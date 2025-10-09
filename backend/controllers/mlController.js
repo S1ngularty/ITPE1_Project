@@ -5,16 +5,17 @@ const ml_count = async (req, res) => {
     const result = await mlService.count(req);
     return res.status(200).json({
       success: true,
-      predictions: response.data.predictions || [],
+      predictions: result.data.predictions || [],
     });
   } catch (error) {
     console.error(
       "Error communicating with Roboflow:",
-      err.response?.data || err.message
+      error.response?.data || error.message
     );
     res.status(500).json({
       success: false,
-      error: err.response?.data || err.message,
+      error: error.response?.data || error.message,
+      
     });
   }
 };
