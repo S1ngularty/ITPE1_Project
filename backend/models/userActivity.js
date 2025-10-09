@@ -9,7 +9,7 @@ const userActivitySchema = new mongoose.Schema({
     screw:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Screw",
-        required:true
+        default:null
     },
     typeOfService:{
         type:String,

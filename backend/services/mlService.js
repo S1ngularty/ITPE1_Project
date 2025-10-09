@@ -72,6 +72,13 @@ const count = async (request) => {
 
   if (!response) throw new Error("object doesnt exist");
 
+    const storeRecent = await UserActivity.create({
+    user:request.user.userId,
+    typeOfService:"count"
+  })
+  
+  if(!storeRecent) throw new Error("failed to store in recent activity of user")
+
   return response;
 };
 
