@@ -10,7 +10,8 @@ function UploadPage() {
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState(null);
-  const [mode, setMode] = useState("classify"); // "classify" | "count"
+  const [mode, setMode] = useState("classify");
+  const [loadingSave,setLoadingSave] = useState(false)
 
   // Dummy history (static for now, later can come from DB)
   const history = [
@@ -71,6 +72,10 @@ function UploadPage() {
     } finally {
       setLoading(false);
     }
+  }
+
+  async function handleSave(){
+    alert("to develop soon")
   }
 
   // Helper function to render screw details from the result data
@@ -307,6 +312,13 @@ function UploadPage() {
                     </div>
                   </div>
                 )}
+                 <button
+                  onClick={handleSave}
+                  disabled={loadingSave}
+                  className="save-btn"
+                >
+                  {loadingSave ? "Saving..." : "💾 Save Result"}
+                </button>
               </div>
             )}
 
@@ -329,7 +341,6 @@ function UploadPage() {
                 <div key={item.id} className="history-item">
                   <span className="file-icon">📄</span>
                   <span className="file-name">{item.name}</span>
-                  <button className="reanalyze-btn">↻</button>
                 </div>
               ))}
             </div>
