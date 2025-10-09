@@ -37,6 +37,15 @@ const classify = async (request) => {
   }).exec();
   if (!screwDocument)
     throw new Error("Screw does not exist on the database collection");
+
+  const storeRecent = await UserActivity.create({
+    user:request.user.userId,
+    screw: screwDocument[0]._id.toString(),
+    typeOfService:"classification"
+  })
+  
+  if(!storeRecent) throw new Error("failed to store in recent activity of user")
+
   return screwDocument[0];
 };
 

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/pages/UploadPage.css";
+import {getToken } from "../utils/authUtil"
 
 function UploadPage() {
   const navigate = useNavigate();
@@ -44,7 +45,9 @@ function UploadPage() {
         `${import.meta.env.VITE_APP_API}api/v1/${mode}`,
         formData,
         {
-          headers: { "Content-Type": "multipart/form-data" },
+          headers: { "Content-Type": "multipart/form-data" ,
+            Authorization:`Bearer ${getToken()}`
+          },
         }
       );
 

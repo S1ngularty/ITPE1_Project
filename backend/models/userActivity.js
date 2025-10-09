@@ -11,6 +11,16 @@ const userActivitySchema = new mongoose.Schema({
         ref:"Screw",
         required:true
     },
+    typeOfService:{
+        type:String,
+        default: null,
+        enum:["classification","count"]
+    },
+    save:{
+        type: Boolean,
+        default:false
+    },
+
 },
 {timestamps:true})
 
