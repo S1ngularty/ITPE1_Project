@@ -75,7 +75,12 @@ function UploadPage() {
   }
 
   async function handleSave(){
-    alert("to develop soon")
+    axios.post( `${import.meta.env.VITE_APP_API}api/v1/${mode}`,formData,{
+      header:{
+        "Content-Type" : "multipart/form-data",
+        Authorization: `Bearer ${getToken()}` 
+      }
+    }).then(response=>setLoading(true)).catch(error=>console.log(error))
   }
 
   // Helper function to render screw details from the result data
