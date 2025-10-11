@@ -74,10 +74,8 @@ function UploadPage() {
   }
 
   async function handleSave(){
-    const formData = new FormData();
-    formData.append("image", selectedFile); 
-    console.table(formData)
-    axios.post( `${import.meta.env.VITE_APP_API}api/v1/saveActivity`,formData,{
+    console.log(results.result._id)
+    axios.post( `${import.meta.env.VITE_APP_API}api/v1/saveActivity`,{screw_id:results.result._id},{
       headers:{
         "Content-Type" : "multipart/form-data",
         Authorization: `Bearer ${getToken()}` 

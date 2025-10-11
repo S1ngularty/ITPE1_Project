@@ -4,6 +4,7 @@ const multer = require("multer");
 const fs = require("fs");
 const axios = require("axios");
 const FormData = require("form-data");
+const {singleImage} = require("../services/cloudinary")
 
 const upload = multer({ dest: "tmp_uploads/" });
 
@@ -27,7 +28,6 @@ const classify = async (request) => {
       },
     }
   );
-  fs.unlink(request.file.path, () => {});
 
   const toFetchDocument = screwData.data.predicted_classes[0];
   console.log("here ", toFetchDocument);
@@ -39,13 +39,21 @@ const classify = async (request) => {
   if (screwDocument.length<1)
     throw new Error("Screw does not exist on the database collection");
 
+  const upload = await singleImage(request.file)
+
+
   const storeRecent = await UserActivity.create({
     user:request.user.userId,
     screw: screwDocument[0]._id.toString(),
-    typeOfService:"classification"
+    typeOfService:"classification",
+    uploadedImage:{
+      url: upload.url,
+      public_id:upload.public_id
+    }
   })
   
   if(!storeRecent) throw new Error("failed to store in recent activity of user")
+  fs.unlink(request.file.path, () => {});
 
   return screwDocument[0];
 };
@@ -73,11 +81,17 @@ const count = async (request) => {
 
   if (!response) throw new Error("object doesnt exist");
 
-    const storeRecent = await UserActivity.create({
+
+  const storeRecent = await UserActivity.create({
     user:request.user.userId,
-    typeOfService:"count"
+    screw: screwDocument[0]._id.toString(),
+    typeOfService:"count",
+    uploadedImage:{
+      url: upload.url,
+      public_id:upload.public_id
+    }
   })
-  
+
   if(!storeRecent) throw new Error("failed to store in recent activity of user")
 
   return response;

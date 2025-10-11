@@ -8,10 +8,17 @@ const recentUploads = async(request)=>{
 }
 
 const saveUploads = async(request)=>{
- if(!request) throw new Error("empty request")
-if(!request.file) throw new Error("file is not found")
-    const uploaded = await singleImage(request.file,)
-console.log(uploaded)
+ if(!request.body) throw new Error("empty request")
+const {screw_id} = request.body
+if(!screw_id) throw new Error("screw ID is indefined")
+console.log(screw_id)
+const updateActivity = await UserActivity.findOne({user:request.user.userId, screw:screw_id}).exec()
+updateActivity.saveStatus=true
+updateActivity.save()
+console.log(updateActivity)
+if(!updateActivity) throw new Error("Failed to save the analysis record")
+return updateActivity
+
 }
 
 module.exports = {saveUploads}

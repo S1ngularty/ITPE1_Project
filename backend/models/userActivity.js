@@ -16,10 +16,20 @@ const userActivitySchema = new mongoose.Schema({
         default: null,
         enum:["classification","count"]
     },
-    save:{
+    saveStatus:{
         type: Boolean,
         default:false
     },
+    uploadedImage:{
+        public_id:{
+            type:String,
+            required:true,
+        },
+        url:{
+            type:String,
+            required:true
+        }
+    }
 
 },
 {timestamps:true})
