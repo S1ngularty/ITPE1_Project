@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/pages/UploadPage.css";
@@ -37,9 +37,8 @@ function UploadPage() {
     setResults(null);
 
     const formData = new FormData();
-    formData.append("image", selectedFile); // must match backend multer field
-    formData.append("mode", mode); // tell backend which function to use
-
+    formData.append("image", selectedFile); 
+    formData.append("mode", mode); 
     try {
       console.log(mode)
       const res = await axios.post(
@@ -75,8 +74,11 @@ function UploadPage() {
   }
 
   async function handleSave(){
-    axios.post( `${import.meta.env.VITE_APP_API}api/v1/${mode}`,formData,{
-      header:{
+    const formData = new FormData();
+    formData.append("image", selectedFile); 
+    console.table(formData)
+    axios.post( `${import.meta.env.VITE_APP_API}api/v1/saveActivity`,formData,{
+      headers:{
         "Content-Type" : "multipart/form-data",
         Authorization: `Bearer ${getToken()}` 
       }
@@ -194,7 +196,6 @@ function UploadPage() {
 
   return (
     <div className="upload-page">
-
       {/* Main Content - Horizontal Layout */}
       <main className="upload-main-horizontal">
         

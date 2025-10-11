@@ -30,12 +30,13 @@ const classify = async (request) => {
   fs.unlink(request.file.path, () => {});
 
   const toFetchDocument = screwData.data.predicted_classes[0];
-  // console.log("here ", toFetchDocument);
+  console.log("here ", toFetchDocument);
 
   const screwDocument = await Screw.find({
     name: toFetchDocument,
   }).exec();
-  if (!screwDocument)
+
+  if (screwDocument.length<1)
     throw new Error("Screw does not exist on the database collection");
 
   const storeRecent = await UserActivity.create({

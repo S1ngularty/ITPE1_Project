@@ -1,7 +1,10 @@
 const express = require("express");
 const router = express.Router();
+const multer = require("multer")
+const upload = multer({ dest: "tmp_uploads/" });
 const authMiddleware = require("../middleware/auth");
 const userController = require("../controllers/userController");
+const userActivityController= require("../controllers/userActivityController")
 // router.get("/user",authMiddleware.verifyToken, userController.userList);
 router.get("/user", authMiddleware.verifyToken, userController.getUser);
 router.post("/user", authMiddleware.verifyToken, userController.update);
@@ -11,5 +14,8 @@ router.patch(
   userController.updatePassword
 );
 router.delete("/user/:user", userController.userDelete);
+
+//activity
+router.post("/saveActivity",authMiddleware.verifyToken,upload.single('image'),userActivityController.saveActivity)
 
 module.exports = router;
