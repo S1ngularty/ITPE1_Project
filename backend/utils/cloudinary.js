@@ -1,0 +1,32 @@
+const cloudinary = require("../config/cloudinary");
+const streamifier = require("streamifier");
+
+exports.uploadToCloudinary = async (fileBuffer) => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { folder: "Screws" },
+      (err, result) => {
+        if (err) return reject(err);
+        return resolve(result);
+      }
+    );
+    streamifier.createReadStream(fileBuffer).pipe(uploadStream);
+  });
+};
+
+exports.destroyImage = (id) => {
+  return new Promise((resolve, reject) => {
+    cloudinary.uploader.destroy(id, (error, result) => {
+      if (error) reject(error);
+      resolve(result);
+    });
+  });
+};
+
+exports.singleImage=async(file)=>{
+  console.log(file,cloudinary.config())
+    const result = await cloudinary.uploader.upload(file.path);
+  if (!result) throw new Error("Failed to store on Cloudinary");
+  console.log(result);
+  return result;
+} 
