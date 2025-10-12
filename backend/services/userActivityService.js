@@ -22,7 +22,7 @@ return updateActivity
 }
 
 fetchSaveAnalysis = async()=>{
-    const savedAnalysis = await UserActivity.find({}).exec()
+    const savedAnalysis = await UserActivity.find({}).populate('user screw').exec()
     if(savedAnalysis.length<1) throw new Error("No saved analysis yet")
     return savedAnalysis
 }
