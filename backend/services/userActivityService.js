@@ -21,4 +21,10 @@ return updateActivity
 
 }
 
-module.exports = {saveUploads}
+fetchSaveAnalysis = async()=>{
+    const savedAnalysis = await UserActivity.find({}).exec()
+    if(savedAnalysis.length<1) throw new Error("No saved analysis yet")
+    return savedAnalysis
+}
+
+module.exports = {saveUploads, fetchSaveAnalysis}

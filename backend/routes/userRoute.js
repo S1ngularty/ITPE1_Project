@@ -17,5 +17,6 @@ router.delete("/user/:user", userController.userDelete);
 
 //activity
 router.post("/saveActivity",authMiddleware.verifyToken,upload.single('image'),userActivityController.saveActivity)
+router.get("/savedAnalysis",authMiddleware.verifyToken,userActivityController.fetchAnalysis)
 
 module.exports = router;
