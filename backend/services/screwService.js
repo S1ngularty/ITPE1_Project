@@ -1,5 +1,5 @@
 const Screw = require("../models/screw");
-const { uploadToCloudinary } = require("./cloudinary");
+const { uploadToCloudinary } = require("../utils/cloudinary");
 
 exports.createScrew = async (body, files) => {
   if (!body) throw new Error("request body is undentified");

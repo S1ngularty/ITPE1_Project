@@ -24,9 +24,9 @@ exports.destroyImage = (id) => {
 };
 
 exports.singleImage=async(file)=>{
-  console.log(file,cloudinary.config())
+  // console.log(file,cloudinary.config())
     const result = await cloudinary.uploader.upload(file.path);
   if (!result) throw new Error("Failed to store on Cloudinary");
-  console.log(result);
+  // console.log(result);
   return result;
 } 

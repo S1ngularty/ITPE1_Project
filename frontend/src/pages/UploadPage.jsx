@@ -12,7 +12,14 @@ function UploadPage() {
   const [results, setResults] = useState(null);
   const [mode, setMode] = useState("classify");
   const [loadingSave,setLoadingSave] = useState(false)
+  const [saveData, setSaveData] =useState("")
 
+  useEffect(()=>{ 
+    console.log(saveData)
+  },[saveData])
+    useEffect(()=>{ 
+    console.log(results)
+  },[results])
   // Dummy history (static for now, later can come from DB)
   const history = [
     { id: 1, name: "screw_01.png" },
@@ -53,7 +60,7 @@ function UploadPage() {
 
       const data = res.data;
       console.log(data);
-
+      setSaveData(data.storeRecent._id.toString())
       if (mode === "classify") {
         setResults(data);
       } else if (mode === "count") {
@@ -74,8 +81,9 @@ function UploadPage() {
   }
 
   async function handleSave(){
-    console.log(results.result._id)
-    axios.post( `${import.meta.env.VITE_APP_API}api/v1/saveActivity`,{screw_id:results.result._id},{
+    // console.log(results.result._id)
+    const data = {screw_id:results.result?._id} || {}
+    axios.post( `${import.meta.env.VITE_APP_API}api/v1/saveActivity`,data,{
       headers:{
         "Content-Type" : "multipart/form-data",
         Authorization: `Bearer ${getToken()}` 

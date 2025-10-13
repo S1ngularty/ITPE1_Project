@@ -3,18 +3,19 @@ const mlService = require("../services/mlService");
 const ml_count = async (req, res) => {
   try {
     const result = await mlService.count(req);
+    // console.log(result.response.data,result.storeRecent)
     return res.status(200).json({
       success: true,
-      predictions: result.data.predictions || [],
+      predictions: result.response.data.predictions || [],
+      storeRecent: result.storeRecent
     });
   } catch (error) {
     console.error(
-      "Error communicating with Roboflow:",
-      error.response?.data || error.message
+      "Error:",error.message
     );
     res.status(500).json({
       success: false,
-      error: error.response?.data || error.message,
+      error:error.message,
       
     });
   }
@@ -23,10 +24,10 @@ const ml_count = async (req, res) => {
 const ml_classify = async (req, res) => {
   try {
     const result = await mlService.classify(req);
-    // console.log(result)
-    return res.status(200).json({ success: true, result });
+    console.log(result)
+    return res.status(200).json({ success: true, result:result.screwDocument, storeRecent:result.storeRecent });
   } catch (error) {
-    console.log(error.message);
+    // console.log(error.message);
     return res.status(500).json({ success: false, error: error.message });
   }
 };

@@ -1,5 +1,5 @@
 const UserActivity = require("../models/userActivity")
-const { uploadToCloudinary,singleImage } = require("./cloudinary");
+const { uploadToCloudinary,singleImage } = require("../utils/cloudinary");
 
 const recentUploads = async(request)=>{
     if(!request) throw new Error ("no request found")
