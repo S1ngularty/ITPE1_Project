@@ -82,7 +82,7 @@ function UploadPage() {
 
   async function handleSave(){
     // console.log(results.result._id)
-    const data = {screw_id:results.result?._id} || {}
+    const data = {activityID:saveData} || {}
     axios.post( `${import.meta.env.VITE_APP_API}api/v1/saveActivity`,data,{
       headers:{
         "Content-Type" : "multipart/form-data",

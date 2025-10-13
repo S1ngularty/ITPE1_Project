@@ -9,10 +9,10 @@ const recentUploads = async(request)=>{
 
 const saveUploads = async(request)=>{
  if(!request.body) throw new Error("empty request")
-const {screw_id} = request.body
-if(!screw_id) throw new Error("screw ID is indefined")
-console.log(screw_id)
-const updateActivity = await UserActivity.findOne({user:request.user.userId, screw:screw_id}).exec()
+const {activityID} = request.body
+if(!activityID) throw new Error("screw ID is indefined")
+console.log(activityID)
+const updateActivity = await UserActivity.findById(activityID).exec()
 updateActivity.saveStatus=true
 updateActivity.save()
 console.log(updateActivity)
