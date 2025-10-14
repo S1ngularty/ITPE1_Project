@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/pages/Profile.css";
+import Navbar from "../components/layouts/Navbar";
 
 import axios from "axios";
 import { getToken } from "../utils/authUtil";
@@ -101,6 +102,7 @@ function Profile() {
 
   return (
     <div className="profile-page">
+      <Navbar></Navbar>
       {/* Main */}
       <main className="profile-main">
         {/* Profile Info Section */}
