@@ -4,6 +4,8 @@ import "../styles/pages/SaveAnalysesPage.css";
 import {getToken} from "../utils/authUtil"
 import axios from "axios"
 
+import Navbar from "../components/layouts/Navbar";
+
 function SavedAnalyses() {
   const navigate = useNavigate();
   const [analyses, setAnalyses] = useState([]);
@@ -37,6 +39,7 @@ function SavedAnalyses() {
 
   return (
     <div className="saved-page">
+      <Navbar/>
       <main className="saved-main">
         <h1>Your Saved Analyses</h1>
 

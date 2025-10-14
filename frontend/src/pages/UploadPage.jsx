@@ -5,7 +5,7 @@ import "../styles/pages/UploadPage.css";
 import { toast } from "react-toastify";
 import { getToken } from "../utils/authUtil";
 import notify from "../components/Toast";
-
+import Navbar from "../components/layouts/Navbar";
 function UploadPage() {
   const navigate = useNavigate();
   const [selectedFile, setSelectedFile] = useState(null);
@@ -122,6 +122,7 @@ function UploadPage() {
 
     return (
       <>
+      <Navbar/>
         {/* Screw Name & Category */}
         <div className="result-card primary">
           <div className="card-icon">🏷️</div>

@@ -20,7 +20,6 @@ function App() {
     <>
       <ToastContainer />
       <Router>
-        {getToken() && <Navbar />}
         <Routes>
           <Route path="/login" element={<Login />}></Route>
           <Route path="/register" element={<Register />}></Route>

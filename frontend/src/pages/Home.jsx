@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/pages/Home.css";
+import Navbar from "../components/layouts/Navbar";
 
 function Home() {
   const navigate = useNavigate();
@@ -28,6 +29,7 @@ function Home() {
 
   return (
     <div className="home-page">
+      <Navbar/>
       <main className="main-content">
         <div className="welcome-section">
           <h1>Welcome to ScrewMatcher, {userName}!</h1>
