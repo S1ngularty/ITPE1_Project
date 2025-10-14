@@ -12,7 +12,7 @@ function Home() {
   }
 
   function handleViewSaved() {
-    alert("View saved analyses coming soon!");
+    navigate("../save-analyses")
   }
 
   function handleLogout() {
