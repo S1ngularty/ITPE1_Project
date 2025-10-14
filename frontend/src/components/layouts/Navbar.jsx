@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../../styles/components/navbar.css";
-
+import SearchBar from "../search-bar";
 function Navbar() {
   const navigate = useNavigate();
 
@@ -13,9 +13,9 @@ function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar-logo">
-        <span className="navbar-icon">⚙</span> ScrewSort
+        <span className="navbar-icon">⚙</span> ScrewIT
       </div>
-
+          <SearchBar/>
       <div className="navbar-links">
         <Link to="/home" className="navbar-link">
           Home

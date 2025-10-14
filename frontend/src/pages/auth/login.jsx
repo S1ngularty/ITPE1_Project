@@ -40,7 +40,7 @@ function Login() {
   return (
     <div style={styles.page}>
       <div style={styles.container}>
-        <h1 style={styles.title}>ScrewSort</h1>
+        <h1 style={styles.title}>ScrewIT</h1>
         <p style={styles.subtitle}>Sign in to your account</p>
 
         <form onSubmit={handleSubmit} style={styles.form}>
