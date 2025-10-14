@@ -1,8 +1,10 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/pages/UploadPage.css";
-import {getToken } from "../utils/authUtil"
+import { toast } from "react-toastify";
+import { getToken } from "../utils/authUtil";
+import notify from "../components/Toast";
 
 function UploadPage() {
   const navigate = useNavigate();
@@ -11,15 +13,15 @@ function UploadPage() {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState(null);
   const [mode, setMode] = useState("classify");
-  const [loadingSave,setLoadingSave] = useState(false)
-  const [saveData, setSaveData] =useState("")
+  const [loadingSave, setLoadingSave] = useState(false);
+  const [saveData, setSaveData] = useState("");
 
-  useEffect(()=>{ 
-    console.log(saveData)
-  },[saveData])
-    useEffect(()=>{ 
-    console.log(results)
-  },[results])
+  // useEffect(()=>{
+  //   console.log(saveData)
+  // },[saveData])
+  //   useEffect(()=>{
+  //   console.log(results)
+  // },[results])
   // Dummy history (static for now, later can come from DB)
   const history = [
     { id: 1, name: "screw_01.png" },
@@ -44,23 +46,24 @@ function UploadPage() {
     setResults(null);
 
     const formData = new FormData();
-    formData.append("image", selectedFile); 
-    formData.append("mode", mode); 
+    formData.append("image", selectedFile);
+    formData.append("mode", mode);
     try {
-      console.log(mode)
+      console.log(mode);
       const res = await axios.post(
         `${import.meta.env.VITE_APP_API}api/v1/${mode}`,
         formData,
         {
-          headers: { "Content-Type": "multipart/form-data" ,
-            Authorization:`Bearer ${getToken()}`
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${getToken()}`,
           },
         }
       );
 
       const data = res.data;
       console.log(data);
-      setSaveData(data.storeRecent._id.toString())
+      setSaveData(data.storeRecent._id.toString());
       if (mode === "classify") {
         setResults(data);
       } else if (mode === "count") {
@@ -74,21 +77,31 @@ function UploadPage() {
         "Error analyzing image:",
         err.response?.data || err.message
       );
-      alert("Failed to analyze image. Check backend and Python service.");
+      notify("error","Failed to analyze image. Something went wrong, Please try again later");
     } finally {
       setLoading(false);
     }
   }
 
-  async function handleSave(){
+  async function handleSave() {
     // console.log(results.result._id)
-    const data = {activityID:saveData} || {}
-    axios.post( `${import.meta.env.VITE_APP_API}api/v1/saveActivity`,data,{
-      headers:{
-        "Content-Type" : "multipart/form-data",
-        Authorization: `Bearer ${getToken()}` 
-      }
-    }).then(response=>setLoading(true)).catch(error=>console.log(error))
+    setLoadingSave(true);
+    const data = { activityID: saveData } || {};
+    axios
+      .post(`${import.meta.env.VITE_APP_API}api/v1/saveActivity`, data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
+      .then((response) => {
+        setLoadingSave(false);
+        notify("success","analysis is saved successfully")
+      })
+      .catch((error) =>{
+        notify("warning",error.message)
+        console.log(error.message);
+      });
   }
 
   // Helper function to render screw details from the result data
@@ -116,7 +129,9 @@ function UploadPage() {
             <h4>Screw Identification</h4>
             <div className="screw-basic-info">
               <div className="screw-name">{screw.name || "Unknown Screw"}</div>
-              <div className="screw-category">{screw.category || "No category"}</div>
+              <div className="screw-category">
+                {screw.category || "No category"}
+              </div>
             </div>
           </div>
         </div>
@@ -135,11 +150,15 @@ function UploadPage() {
               </div>
               <div className="spec-item">
                 <span className="spec-label">Material </span>
-                <span className="spec-value">{screw.material || "Not specified"}</span>
+                <span className="spec-value">
+                  {screw.material || "Not specified"}
+                </span>
               </div>
               <div className="spec-item">
                 <span className="spec-label">Strength</span>
-                <span className="spec-value">{screw.strength || "Not specified"}</span>
+                <span className="spec-value">
+                  {screw.strength || "Not specified"}
+                </span>
               </div>
             </div>
           </div>
@@ -171,7 +190,10 @@ function UploadPage() {
               <div className="images-grid">
                 {screw.images.map((image, index) => (
                   <div key={image._id || index} className="image-item">
-                    <img src={image.url} alt={`${screw.name} reference ${index + 1}`} />
+                    <img
+                      src={image.url}
+                      alt={`${screw.name} reference ${index + 1}`}
+                    />
                   </div>
                 ))}
               </div>
@@ -204,19 +226,24 @@ function UploadPage() {
     <div className="upload-page">
       {/* Main Content - Horizontal Layout */}
       <main className="upload-main-horizontal">
-        
         {/* Left Section - Image Upload */}
         <section className="upload-section">
           <div className="section-card">
             <h2>Upload Image</h2>
-            
+
             {/* Upload area */}
             <label className="upload-box">
               <div className="upload-icon">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                  <polyline points="17 8 12 3 7 8"/>
-                  <line x1="12" y1="3" x2="12" y2="15"/>
+                <svg
+                  width="48"
+                  height="48"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                >
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="17 8 12 3 7 8" />
+                  <line x1="12" y1="3" x2="12" y2="15" />
                 </svg>
               </div>
               <span className="upload-text">Drag & drop your file here</span>
@@ -324,7 +351,7 @@ function UploadPage() {
                     </div>
                   </div>
                 )}
-                 <button
+                <button
                   onClick={handleSave}
                   disabled={loadingSave}
                   className="save-btn"

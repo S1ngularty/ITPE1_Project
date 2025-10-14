@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import notify from "../../components/Toast";
 
 function Login() {
   const [credentials, setCredentials] = useState({ email: "", password: "" });
@@ -16,10 +17,12 @@ function Login() {
       .post(`${import.meta.env.VITE_APP_API}api/v1/login`, credentials)
       .then((response) => {
         localStorage.setItem("token", response.data.token);
+        notify("success","Login successfully")
         navigate("/home");
       })
       .catch((err) => {
         setError(err.response?.data?.message || "Login failed. Please try again.");
+        notify("error","Invalid input, please check your username or password")
       })
       .finally(() => setLoading(false));
   }

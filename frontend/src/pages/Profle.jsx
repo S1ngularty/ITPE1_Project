@@ -4,6 +4,7 @@ import "../styles/pages/Profile.css";
 
 import axios from "axios";
 import { getToken } from "../utils/authUtil";
+import notify from "../components/Toast";
 
 function Profile() {
   const navigate = useNavigate();
@@ -60,8 +61,14 @@ function Profile() {
           },
         }
       )
-      .then((response) => fetchProfile())
-      .catch((error) => console.log(error.message));
+      .then((response) => {
+        fetchProfile();
+        notify("success", "profile is updated successfully");
+      })
+      .catch((error) => {
+        notify("warning",error.message)
+        console.log(error.message);
+      });
   }
 
   function handleSavePassword(e) {
@@ -82,8 +89,13 @@ function Profile() {
           },
         }
       )
-      .then((response) => fetchProfile())
-      .catch((error) => console.log(error));
+      .then((response) => {fetchProfile()
+        notify("success","password is saved successfully")
+      })
+      .catch((error) => {
+        notify("warning",error.message)
+        console.log(error.message);
+      });
     setMessage("Password updated successfully (placeholder).");
   }
 

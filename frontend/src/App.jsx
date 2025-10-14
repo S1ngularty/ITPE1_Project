@@ -1,6 +1,9 @@
-import { useState, } from "react";
+import { useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import "./App.css";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import { getToken } from "./utils/authUtil";
 
 import Navbar from "./components/layouts/Navbar";
@@ -13,10 +16,9 @@ import SavedAnalyses from "./pages/SavedAnalysesPage.jsx";
 import Profile from "./pages/Profle";
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
     <>
+      <ToastContainer />
       <Router>
         {getToken() && <Navbar />}
         <Routes>
