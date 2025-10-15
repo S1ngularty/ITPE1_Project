@@ -19,4 +19,6 @@ router.delete("/user/:user", userController.userDelete);
 router.post("/saveActivity",authMiddleware.verifyToken,upload.single('image'),userActivityController.saveActivity)
 router.get("/savedAnalysis",authMiddleware.verifyToken,userActivityController.fetchAnalysis)
 
+router.post("/password-recovery",userController.recoverPassword)
+
 module.exports = router;

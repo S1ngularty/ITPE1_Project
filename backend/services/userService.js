@@ -1,4 +1,5 @@
 const User = require("../models/user");
+const emailUtil= require("../utils/email")
 
 exports.userList = async () => {
   let users = await User.find({}).sort({ createdAt: "ascending" }).exec();
@@ -57,3 +58,13 @@ exports.userDelete = async (param) => {
     );
   return deletedUser;
 };
+
+exports.passwordRecovery= async(request)=>{
+ if(!"email" in request) throw new Error("email field doesnt exist!")
+  const {email} = request
+ const toRecover = await User.findOne({email:email}).exec()
+  if(!toRecover) throw new Error("email does not exist in the database!")
+  await toRecover.passwordRecovery()
+  await toRecover.save()
+  await emailUtil.passwordRecovery(email)
+}

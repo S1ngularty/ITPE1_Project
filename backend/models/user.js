@@ -35,6 +35,7 @@ const userSchema = new mongoose.Schema(
       default: "user",
       enum: ["user", "admin", "guest"],
     },
+    resetPasswordToken:String,
     resetPasswordExpire: Date,
   },
   { timestamps: true }
@@ -55,5 +56,11 @@ userSchema.methods.getToken = function () {
 userSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
+
+userSchema.methods.passwordRecovery = async function (){ 
+  const token =crypto.randomBytes(32).toString("hex")
+  this.resetPasswordToken= token
+  this.resetPasswordExpire= Date.now() + 15 * 60 * 1000
+}
 
 module.exports = mongoose.model("User", userSchema);
