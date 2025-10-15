@@ -13,14 +13,32 @@ function RecoveryPassword (){
         newPassword:"",
         confirmPassword:""
     })
+    let navigate = useNavigate()
     
+    function passwordHandler(field,e){
+        setPassword({
+            ...password,[field]:e.target.value
+        })
+    }
+
+    function handlePasswordSubmit(){
+        if(password.newPassword !== password.confirmPassword) return
+        axios.post(`${import.meta.env.VITE_APP_API}api/v1/reset-password/${token}`,{password:password.newPassword,email})
+        .then(response=>{
+            notify("success","successfully updated your password")
+            navigate("/login")
+        })
+        .catch(error=>{
+            notify("error","something went wrong, please try again")
+            console.log(error)
+        })
+    }
 
     function handleEmail(){
         axios.post(`${import.meta.env.VITE_APP_API}api/v1/password-recovery`,{email})
         .then(response=>{
             setToken(response.data.token)
             console.log(response.data.token)
-            setEmail("")
         })
         .catch(error=>console.log(error))
     }
@@ -38,12 +56,12 @@ function RecoveryPassword (){
             </div>
         );
 
-        if (token && !email) return (
+        if (token && email) return (
             <div className="auth-box">
                 <h2>Set New Password</h2>
-                <input type="password" placeholder="New password" />
-                <input type="password" placeholder="Confirm password" />
-                <button>Update</button>
+                <input type="password" onChange={(e)=>passwordHandler("newPassword",e)} placeholder="New password" />
+                <input type="password" onChange={(e)=>passwordHandler("confirmPassword",e)} placeholder="Confirm password" />
+                <button onClick={handlePasswordSubmit}>Update</button>
             </div>
         );
     }

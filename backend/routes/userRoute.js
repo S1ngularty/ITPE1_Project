@@ -20,5 +20,6 @@ router.post("/saveActivity",authMiddleware.verifyToken,upload.single('image'),us
 router.get("/savedAnalysis",authMiddleware.verifyToken,userActivityController.fetchAnalysis)
 
 router.post("/password-recovery",userController.recoverPassword)
+router.post("/reset-password/:token",userController.recovery_setNewPassword)
 
 module.exports = router;

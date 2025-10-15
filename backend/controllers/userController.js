@@ -86,3 +86,19 @@ exports.recoverPassword= async(req,res)=>{
     })
   }
 }
+
+exports.recovery_setNewPassword = async(req,res)=>{
+  try {
+     const result = await userService.setNewPassword(req)
+    return res.status(200).json({
+      success:true,
+      result
+    })
+  } catch (error) {
+     console.log(error.message)
+    return res.status(500).json({
+      success:false,
+      error:error.message
+    })
+  }
+}

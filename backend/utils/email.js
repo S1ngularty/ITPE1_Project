@@ -5,6 +5,6 @@ exports.passwordRecovery=async(email)=>{
         from:"ScrewIT <no-reply@ScrewIT.com>",
         to:email,
         subject:"Password Reset",
-        html:`Click <a href="http://localhost:5173/api/v1/password-recovery">here</a> to reset your password`
+        html:`Click <a href="http://localhost:5173/api/v1/recovery-password">here</a> to reset your password`
     })
 }

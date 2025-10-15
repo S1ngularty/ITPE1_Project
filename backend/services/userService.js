@@ -61,7 +61,7 @@ exports.userDelete = async (param) => {
 
 exports.passwordRecovery= async(request)=>{
  if(!"email" in request) throw new Error("email field doesnt exist!")
-  console.log(request)
+  // console.log(request)
   const {email} = request
  const toRecover = await User.findOne({email:email}).exec()
   if(!toRecover) throw new Error("email does not exist in the database!")
@@ -70,4 +70,22 @@ exports.passwordRecovery= async(request)=>{
   await emailUtil.passwordRecovery(email)
 
   return token
+}
+
+exports.setNewPassword=async(request)=>{
+  if(!request.params.token) throw new Error("token is undentified")
+  const {token} = request.params
+  // console.log(token)
+  if(!Object.keys(request.body).includes("password") || !Object.keys(request.body).includes("email")) throw new Error("some fields is undentified")
+  const {email, password} = request.body
+  // console.log(email,password)
+  const user = await User.findOne({email:email, resetPasswordToken:token, resetPasswordExpire:{$gt:Date.now()}}).exec()
+  if(!user) throw new Error("token is already expired")
+
+  user.password =password
+  user.resetPasswordExpire=undefined
+  user.resetPasswordToken=undefined
+  await user.save()  
+
+  return user
 }
