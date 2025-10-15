@@ -14,6 +14,7 @@ import PrivateRoute from "./PrivateRoute";
 import Home from "./pages/Home";
 import SavedAnalyses from "./pages/SavedAnalysesPage.jsx";
 import Profile from "./pages/Profle";
+import RecoveryPassword from "./pages/auth/RecoveryPassword.jsx";
 
 function App() {
   return (
@@ -55,6 +56,8 @@ function App() {
               </PrivateRoute>
             }
           ></Route>
+          <Route path="/recovery-password" element={<RecoveryPassword></RecoveryPassword>} >
+          </Route>
         </Routes>
       </Router>
     </>

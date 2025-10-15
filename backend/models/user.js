@@ -61,6 +61,7 @@ userSchema.methods.passwordRecovery = async function (){
   const token =crypto.randomBytes(32).toString("hex")
   this.resetPasswordToken= token
   this.resetPasswordExpire= Date.now() + 15 * 60 * 1000
+  return token
 }
 
 module.exports = mongoose.model("User", userSchema);

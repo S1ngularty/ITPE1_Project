@@ -61,10 +61,13 @@ exports.userDelete = async (param) => {
 
 exports.passwordRecovery= async(request)=>{
  if(!"email" in request) throw new Error("email field doesnt exist!")
+  console.log(request)
   const {email} = request
  const toRecover = await User.findOne({email:email}).exec()
   if(!toRecover) throw new Error("email does not exist in the database!")
-  await toRecover.passwordRecovery()
+  const token = await toRecover.passwordRecovery()
   await toRecover.save()
   await emailUtil.passwordRecovery(email)
+
+  return token
 }

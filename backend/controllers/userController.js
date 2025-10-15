@@ -73,10 +73,10 @@ exports.userDelete = async (req, res) => {
 
 exports.recoverPassword= async(req,res)=>{
   try {
-    const result = await userService.passwordRecovery(req.body)
+    const token = await userService.passwordRecovery(req.body)
     return res.status(200).json({
       success:true,
-      result
+      token
     })
   } catch (error) {
     console.log(error.message)
