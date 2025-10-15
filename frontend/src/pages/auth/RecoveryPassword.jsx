@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import {useNavigate} from "react-router-dom"
 import axios from "axios"
 import notify  from "../../components/Toast"
+import "../../styles/pages/auth/recoveryPassword.css"
 
 function RecoveryPassword (){
     let [token,setToken] =useState("")
@@ -25,22 +26,26 @@ function RecoveryPassword (){
     }
 
     function renderPage(){
-        if(!token) return (
-            <div className="email-container">
-                <input type="email" name="email" id="" onChange={(e)=>setEmail(e.target.value)}/>
-                <button onClick={handleEmail}>Proceed</button>
+        if (!token) return (
+            <div className="auth-box">
+                <h2>Reset Password</h2>
+                <input
+                type="email"
+                placeholder="Enter your email"
+                onChange={(e) => setEmail(e.target.value)}
+                />
+                <button onClick={handleEmail}>Continue</button>
             </div>
-        )
-        
-        if(token && !email) return (
-            <div className="password-container">
-                <label htmlFor="">new password</label>
-                <input type="password" />
-                 <label htmlFor="">confirm password</label>
-                <input type="password" />
-                <button>update password</button>
+        );
+
+        if (token && !email) return (
+            <div className="auth-box">
+                <h2>Set New Password</h2>
+                <input type="password" placeholder="New password" />
+                <input type="password" placeholder="Confirm password" />
+                <button>Update</button>
             </div>
-        )
+        );
     }
     
     return renderPage()
