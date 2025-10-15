@@ -122,7 +122,6 @@ function UploadPage() {
 
     return (
       <>
-      <Navbar/>
         {/* Screw Name & Category */}
         <div className="result-card primary">
           <div className="card-icon">🏷️</div>
@@ -225,6 +224,7 @@ function UploadPage() {
 
   return (
     <div className="upload-page">
+      <Navbar/>
       {/* Main Content - Horizontal Layout */}
       <main className="upload-main-horizontal">
         {/* Left Section - Image Upload */}
