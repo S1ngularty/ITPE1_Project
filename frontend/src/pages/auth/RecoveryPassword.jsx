@@ -6,7 +6,8 @@ import notify  from "../../components/Toast"
 import "../../styles/pages/auth/recoveryPassword.css"
 
 function RecoveryPassword (){
-    let [token,setToken] =useState("")
+    const searchParams = new URLSearchParams(location.search)
+    const token = searchParams.get("token")
     let [email,setEmail] =useState("")
     let [loading,setLoading] =useState(true)
     let [password,setPassword] =useState({
@@ -22,6 +23,7 @@ function RecoveryPassword (){
     }
 
     function handlePasswordSubmit(){
+        // console.log(token)
         if(password.newPassword !== password.confirmPassword) return
         axios.post(`${import.meta.env.VITE_APP_API}api/v1/reset-password/${token}`,{password:password.newPassword,email})
         .then(response=>{
@@ -37,7 +39,6 @@ function RecoveryPassword (){
     function handleEmail(){
         axios.post(`${import.meta.env.VITE_APP_API}api/v1/password-recovery`,{email})
         .then(response=>{
-            setToken(response.data.token)
             console.log(response.data.token)
         })
         .catch(error=>console.log(error))
@@ -56,7 +57,7 @@ function RecoveryPassword (){
             </div>
         );
 
-        if (token && email) return (
+        if (token) return (
             <div className="auth-box">
                 <h2>Set New Password</h2>
                 <input type="password" onChange={(e)=>passwordHandler("newPassword",e)} placeholder="New password" />
