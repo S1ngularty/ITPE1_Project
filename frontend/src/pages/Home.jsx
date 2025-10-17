@@ -18,10 +18,6 @@ function Home() {
     navigate("../save-analyses");
   }
 
-  function handleLogout() {
-    localStorage.removeItem("token");
-    navigate("/login");
-  }
 
   // function fetchScrews(){
   //    axios(`${import.meta.env.VITE_APP_API}api/v1/screw?keyword=`,{
