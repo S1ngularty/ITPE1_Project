@@ -11,4 +11,4 @@ const logout = () => {
   return true;
 };
 
-export { setToken, getToken,logout };
+export { setToken, getToken, logout };

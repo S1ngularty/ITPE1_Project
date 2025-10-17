@@ -1,24 +1,44 @@
 import React from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/pages/Home.css";
 import Navbar from "../components/layouts/Navbar";
+import { getToken } from "../utils/authUtil";
+import axios from "axios";
 
 function Home() {
   const navigate = useNavigate();
   const userName = "Levi Asher"; // TODO: Replace with actual logged-in user data
-
+  const [screws,setScrews] =useState([])
   function handleUpload() {
     navigate("../upload-page");
   }
 
   function handleViewSaved() {
-    navigate("../save-analyses")
+    navigate("../save-analyses");
   }
 
   function handleLogout() {
     localStorage.removeItem("token");
     navigate("/login");
   }
+
+  function fetchScrews(){
+     axios(`${import.meta.env.VITE_APP_API}api/v1/screw?keyword=`,{
+        headers:{
+            Authorization: `Bearer ${getToken()}`
+        }
+        }).then(response=>{
+            console.log(response.data)
+            setScrews(response.data.result)
+        }).catch(error=>{
+            console.log(error)
+        })
+  }
+
+  useEffect(()=>{
+        fetchScrews()
+  },[])
 
   // Placeholder recent analyses
   const recentAnalyses = [
@@ -29,7 +49,7 @@ function Home() {
 
   return (
     <div className="home-page">
-      <Navbar/>
+      {/* <Navbar /> */}
       <main className="main-content">
         <div className="welcome-section">
           <h1>Welcome to ScrewMatcher, {userName}!</h1>
@@ -52,14 +72,53 @@ function Home() {
           </div>
         </div>
 
-        {/* Recent Analyses */}
+        {/* Discover more */}
         <div className="recent-section">
-          <h3>Recent Analyses</h3>
+          <h3>Discover more screws!</h3>
           <div className="recent-grid">
-            {recentAnalyses.map((item) => (
-              <div key={item.id} className="recent-card">
-                <h4>{item.name}</h4>
-                <p>{item.result}</p>
+            {screws.map((screw) => (
+              <div key={screw._id} className="screw-card">
+                <div className="screw-image">
+                  {/* Add image if available, otherwise use placeholder */}
+                  <img
+                    src={screw.images[0].url || "/placeholder-screw.png"}
+                    alt={screw.name}
+                    onError={(e) => {
+                      e.target.src = "/placeholder-screw.png";
+                    }}
+                  />
+                </div>
+                <div className="screw-info">
+                  <h4 className="screw-name">{screw.name}</h4>
+                  <p className="screw-category">
+                    <strong>Category:</strong> {screw.category}
+                  </p>
+                  <p className="screw-material">
+                    <strong>Material:</strong> {screw.material}
+                  </p>
+                  <div className="screw-sizes">
+                    <strong>Sizes:</strong>
+                    <div className="size-tags">
+                      {screw.sizes.map((size, index) => (
+                        <span key={index} className="size-tag">
+                          {size}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  {screw.price && (
+                    <p className="screw-price">
+                      <strong>Price:</strong> ${screw.price}
+                    </p>
+                  )}
+                  {screw.description && (
+                    <p className="screw-description">
+                      {screw.description.length > 100
+                        ? `${screw.description.substring(0, 100)}...`
+                        : screw.description}
+                    </p>
+                  )}
+                </div>
               </div>
             ))}
           </div>
