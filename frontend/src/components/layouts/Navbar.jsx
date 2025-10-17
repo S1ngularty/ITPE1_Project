@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../../styles/components/navbar.css";
 import SearchBar from "../search-bar";
-function Navbar() {
+function Navbar({searchKeyword}) {
   const navigate = useNavigate();
 
   function handleLogout() {
@@ -15,7 +15,7 @@ function Navbar() {
       <div className="navbar-logo">
         <span className="navbar-icon">⚙</span> ScrewIT
       </div>
-          <SearchBar/>
+          <SearchBar keyword={searchKeyword}/>
       <div className="navbar-links">
         <Link to="/home" className="navbar-link">
           Home

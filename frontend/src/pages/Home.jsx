@@ -23,33 +23,31 @@ function Home() {
     navigate("/login");
   }
 
-  function fetchScrews(){
-     axios(`${import.meta.env.VITE_APP_API}api/v1/screw?keyword=`,{
-        headers:{
-            Authorization: `Bearer ${getToken()}`
-        }
-        }).then(response=>{
-            console.log(response.data)
-            setScrews(response.data.result)
-        }).catch(error=>{
-            console.log(error)
-        })
+  // function fetchScrews(){
+  //    axios(`${import.meta.env.VITE_APP_API}api/v1/screw?keyword=`,{
+  //       headers:{
+  //           Authorization: `Bearer ${getToken()}`
+  //       }
+  //       }).then(response=>{
+  //           console.log(response.data)
+  //           setScrews(response.data.result)
+  //       }).catch(error=>{
+  //           console.log(error)
+  //       })
+  // }
+
+  function search(data){
+    console.log("from home:",data)
+    setScrews(data)
   }
+  // useEffect(()=>{
+  //       fetchScrews()
+  // },[])
 
-  useEffect(()=>{
-        fetchScrews()
-  },[])
-
-  // Placeholder recent analyses
-  const recentAnalyses = [
-    { id: 1, name: "Image_01.png", result: "3 compatible screws found" },
-    { id: 2, name: "Image_02.png", result: "No match found" },
-    { id: 3, name: "Image_03.png", result: "5 compatible screws found" },
-  ];
 
   return (
     <div className="home-page">
-      {/* <Navbar /> */}
+      <Navbar searchKeyword={search}/>
       <main className="main-content">
         <div className="welcome-section">
           <h1>Welcome to ScrewMatcher, {userName}!</h1>
@@ -76,7 +74,7 @@ function Home() {
         <div className="recent-section">
           <h3>Discover more screws!</h3>
           <div className="recent-grid">
-            {screws.map((screw) => (
+            {screws ? screws.map((screw) => (
               <div key={screw._id} className="screw-card">
                 <div className="screw-image">
                   {/* Add image if available, otherwise use placeholder */}
@@ -120,7 +118,7 @@ function Home() {
                   )}
                 </div>
               </div>
-            ))}
+            )) : <h1>No screws found</h1> }
           </div>
         </div>
       </main>
