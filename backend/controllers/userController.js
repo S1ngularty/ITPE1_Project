@@ -102,3 +102,18 @@ exports.recovery_setNewPassword = async(req,res)=>{
     })
   }
 }
+
+exports.getName=async (req,res)=>{
+  try {
+      const result = await userService.getName(req.user)
+      return res.status(200).json({
+        success:true,
+        result
+    })
+  } catch (error) {
+    return res.status(500).json({
+      success:false,
+      error:error.message
+    })
+  }
+}

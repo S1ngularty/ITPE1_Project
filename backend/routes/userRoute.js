@@ -14,7 +14,7 @@ router.patch(
   userController.updatePassword
 );
 router.delete("/user/:user", userController.userDelete);
-
+router.get("/getUser",authMiddleware.verifyToken,userController.getName)
 //activity
 router.post("/saveActivity",authMiddleware.verifyToken,upload.single('image'),userActivityController.saveActivity)
 router.get("/savedAnalysis",authMiddleware.verifyToken,userActivityController.fetchAnalysis)

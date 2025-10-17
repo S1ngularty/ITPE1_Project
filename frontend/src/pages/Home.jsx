@@ -1,15 +1,15 @@
 import React from "react";
-import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/pages/Home.css";
 import Navbar from "../components/layouts/Navbar";
-import { getToken } from "../utils/authUtil";
-import axios from "axios";
+
+import useHome from "../hooks/useHome";
 
 function Home() {
+  const {screws,name,error,search }= useHome()
+
   const navigate = useNavigate();
-  const userName = "Levi Asher"; // TODO: Replace with actual logged-in user data
-  const [screws, setScrews] = useState([]);
+
   function handleUpload() {
     navigate("../upload-page");
   }
@@ -18,34 +18,12 @@ function Home() {
     navigate("../save-analyses");
   }
 
-
-  // function fetchScrews(){
-  //    axios(`${import.meta.env.VITE_APP_API}api/v1/screw?keyword=`,{
-  //       headers:{
-  //           Authorization: `Bearer ${getToken()}`
-  //       }
-  //       }).then(response=>{
-  //           console.log(response.data)
-  //           setScrews(response.data.result)
-  //       }).catch(error=>{
-  //           console.log(error)
-  //       })
-  // }
-
-  function search(data) {
-    console.log("from home:", data);
-    setScrews(data);
-  }
-  // useEffect(()=>{
-  //       fetchScrews()
-  // },[])
-
   return (
     <div className="home-page">
       <Navbar searchKeyword={search} />
       <main className="main-content">
         <div className="welcome-section">
-          <h1>Welcome to ScrewMatcher, {userName}!</h1>
+          <h1>Welcome to ScrewIT, {name}!</h1>
           <p>
             Upload images to detect screws and holes, and get smart suggestions
             for compatible screws. Manage and review your saved analyses easily.

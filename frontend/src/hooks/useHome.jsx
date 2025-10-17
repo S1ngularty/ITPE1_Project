@@ -1,26 +1,37 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { getToken } from "../utils/authUtil";
 
 function useHome() {
   const [screws, setScrews] = useState([]);
   const [name, setName] = useState("");
   const [error, setError] = useState("");
 
-  function fetchScrews() {}
+  function search(data) {
+    // console.log("from home:", data);
+    setScrews(data);
+  }
 
   function fetchUserName() {
     axios
-      .get(`${import.meta.env.VITE_APP_API}api/v1/getUser`)
-      .then((response) => setName(response.data.name))
+      .get(`${import.meta.env.VITE_APP_API}api/v1/getUser`, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
+      .then((response) => {
+        console.log(response.data);
+        setName(response.data.result.name.split(" ")[0]);
+      })
       .catch((error) => console.log(error));
   }
 
-  useEffect(()=>{
-    fetchUserName()
-  },[])
+  useEffect(() => {
+    fetchUserName();
+  }, []);
 
-  return { screws, name, error };
+  return { screws, name, error, search };
 }
 
-export default useHome
+export default useHome;

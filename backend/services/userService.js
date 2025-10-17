@@ -1,5 +1,5 @@
 const User = require("../models/user");
-const emailUtil= require("../utils/email")
+const emailUtil = require("../utils/email");
 
 exports.userList = async () => {
   let users = await User.find({}).sort({ createdAt: "ascending" }).exec();
@@ -59,33 +59,44 @@ exports.userDelete = async (param) => {
   return deletedUser;
 };
 
-exports.passwordRecovery= async(request)=>{
- if(!"email" in request) throw new Error("email field doesnt exist!")
+exports.passwordRecovery = async (request) => {
+  if (!"email" in request) throw new Error("email field doesnt exist!");
   // console.log(request)
-  const {email} = request
- const toRecover = await User.findOne({email:email}).exec()
-  if(!toRecover) throw new Error("email does not exist in the database!")
-  const token = await toRecover.passwordRecovery()
-  await toRecover.save()
-  await emailUtil.passwordRecovery(email,token)
+  const { email } = request;
+  const toRecover = await User.findOne({ email: email }).exec();
+  if (!toRecover) throw new Error("email does not exist in the database!");
+  const token = await toRecover.passwordRecovery();
+  await toRecover.save();
+  await emailUtil.passwordRecovery(email, token);
 
-  return token
-}
+  return token;
+};
 
-exports.setNewPassword=async(request)=>{
-  if(!request.params.token) throw new Error("token is undentified")
-  const {token} = request.params
+exports.setNewPassword = async (request) => {
+  if (!request.params.token) throw new Error("token is undentified");
+  const { token } = request.params;
   // console.log(token)
-  if(!Object.keys(request.body).includes("email")) throw new Error("some fields is undentified")
-  const {password} = request.body
+  if (!Object.keys(request.body).includes("email"))
+    throw new Error("some fields is undentified");
+  const { password } = request.body;
   // console.log(password)
-  const user = await User.findOne({resetPasswordToken:token, resetPasswordExpire:{$gt:Date.now()}}).exec()
-  if(!user) throw new Error("token is already expired")
+  const user = await User.findOne({
+    resetPasswordToken: token,
+    resetPasswordExpire: { $gt: Date.now() },
+  }).exec();
+  if (!user) throw new Error("token is already expired");
 
-  user.password =password
-  user.resetPasswordExpire=undefined
-  user.resetPasswordToken=undefined
-  await user.save()  
+  user.password = password;
+  user.resetPasswordExpire = undefined;
+  user.resetPasswordToken = undefined;
+  await user.save();
 
-  return user
-}
+  return user;
+};
+
+exports.getName = async (user) => {
+  if (!user.userId) throw new Error("user id is undefined");
+  const username = await User.findById(user.userId).select("name").exec();
+  if (!username) throw new Error("cannot find the user on the collection");
+  return username;
+};
