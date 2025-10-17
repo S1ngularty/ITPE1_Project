@@ -15,7 +15,7 @@ function Navbar({searchKeyword}) {
       <div className="navbar-logo">
         <span className="navbar-icon">⚙</span> ScrewIT
       </div>
-          <SearchBar keyword={searchKeyword}/>
+          <SearchBar keyword={typeof searchKeyword === "function" ? searchKeyword : null}/>
       <div className="navbar-links">
         <Link to="/home" className="navbar-link">
           Home

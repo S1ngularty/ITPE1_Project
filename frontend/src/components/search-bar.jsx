@@ -20,7 +20,7 @@ function SearchBar({ keyword }) {
       }
     )
       .then((response) => {
-        console.log(response.data);
+        // console.log(response.data);
         setResults(response.data);
       })
       .catch((error) => {
@@ -33,6 +33,7 @@ function SearchBar({ keyword }) {
   }, [dataToSearch]);
 
   useEffect(() => {
+    if(!keyword) return
     keyword(results.result);
   }, [results]);
   return (
