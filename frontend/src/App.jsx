@@ -15,6 +15,7 @@ import Home from "./pages/Home";
 import SavedAnalyses from "./pages/SavedAnalysesPage.jsx";
 import Profile from "./pages/Profle";
 import RecoveryPassword from "./pages/auth/RecoveryPassword.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
 
 function App() {
   return (
@@ -30,34 +31,38 @@ function App() {
               <PrivateRoute redirectedTo={"/login"}>
                 <Home></Home>
               </PrivateRoute>
-            }
-          ></Route>
+            }></Route>
+          <Route
+            path="/dashboard"
+            element={
+              <PrivateRoute redirectedTo={"/login"}>
+                <Dashboard></Dashboard>
+              </PrivateRoute>
+            }></Route>
           <Route
             path="/save-analyses"
             element={
               <PrivateRoute redirectedTo={"/login"}>
                 <SavedAnalyses></SavedAnalyses>
               </PrivateRoute>
-            }
-          ></Route>
+            }></Route>
           <Route
             path="/profile"
             element={
               <PrivateRoute redirectedTo={"/login"}>
                 <Profile></Profile>
               </PrivateRoute>
-            }
-          ></Route>
+            }></Route>
           <Route
             path="/upload-page"
             element={
               <PrivateRoute redirectedTo={"/login"}>
                 <UploadPage></UploadPage>
               </PrivateRoute>
-            }
-          ></Route>
-          <Route path="/recovery-password" element={<RecoveryPassword></RecoveryPassword>} >
-          </Route>
+            }></Route>
+          <Route
+            path="/recovery-password"
+            element={<RecoveryPassword></RecoveryPassword>}></Route>
         </Routes>
       </Router>
     </>

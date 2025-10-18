@@ -20,7 +20,7 @@ function Navbar({searchKeyword}) {
         <Link to="/home" className="navbar-link">
           Home
         </Link>
-        <Link to="#" className="navbar-link">
+        <Link to="/dashboard" className="navbar-link">
           Dashboard
         </Link>
         <Link to="/profile" className="navbar-link">

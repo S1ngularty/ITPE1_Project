@@ -6,7 +6,7 @@ import Navbar from "../components/layouts/Navbar";
 import useHome from "../hooks/useHome";
 
 function Home() {
-  const {screws,name,error,search }= useHome()
+  const { screws, name, error, search } = useHome();
 
   const navigate = useNavigate();
 
@@ -25,8 +25,8 @@ function Home() {
         <div className="welcome-section">
           <h1>Welcome to ScrewIT, {name}!</h1>
           <p>
-            Upload images to detect screws and holes, and get smart suggestions
-            for compatible screws. Manage and review your saved analyses easily.
+            Upload images to automatically classify and count screws. Preview,
+            discover, and save your analyses with ease.
           </p>
         </div>
 
