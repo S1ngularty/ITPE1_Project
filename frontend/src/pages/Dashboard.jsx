@@ -43,6 +43,8 @@ const Dashboard = () => {
     }
   };
 
+
+
   const transformApiData = (result) => {
     const { activity, requestUsage } = result;
     const allActivities = [...activity.isSave, ...activity.notSave];
@@ -118,6 +120,12 @@ const Dashboard = () => {
       savedItems,
     };
   };
+
+  const daysRemainingBeforeReset=()=>{
+    const date = new Date
+    return Math.abs(date.getDate()-30)
+  }
+  daysRemainingBeforeReset()
 
   const getTimeAgo = (timestamp) => {
     const now = new Date();
@@ -230,7 +238,7 @@ const Dashboard = () => {
                   </div>
                   <div className="usage-stat">
                     <span className="usage-label">Resets in</span>
-                    <span className="usage-value">15 days</span>
+                    <span className="usage-value">{daysRemainingBeforeReset()}</span>
                   </div>
                 </div>
               </div>
