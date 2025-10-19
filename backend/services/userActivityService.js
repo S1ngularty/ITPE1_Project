@@ -43,11 +43,9 @@ const dashboardInfo = async (user) => {
   for (let activity of history) {
     // console.log(activity)
     if (activity.saveStatus === true) {
-      console.log(1)
       isSave.push(activity);
       continue;
     }
-    console.log(0)
     notSave.push(activity);
   }  
 

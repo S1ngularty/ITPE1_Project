@@ -37,7 +37,6 @@ const fetchAnalysis= async(req,res)=>{
  const getDashboardInfo = async(req,res)=>{
     try {
         const result = await dashboardInfo(req.user)
-        console.log(result)
         return res.status(200).json({
             success:true,
             result
