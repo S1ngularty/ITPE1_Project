@@ -22,4 +22,6 @@ router.get("/savedAnalysis",authMiddleware.verifyToken,userActivityController.fe
 router.post("/password-recovery",userController.recoverPassword)
 router.post("/reset-password/:token",userController.recovery_setNewPassword)
 
+router.get("/getDashboard",authMiddleware.verifyToken, userActivityController.getDashboardInfo)
+
 module.exports = router;
