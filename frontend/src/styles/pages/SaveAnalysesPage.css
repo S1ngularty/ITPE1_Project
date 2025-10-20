@@ -110,6 +110,10 @@
   transform: rotate(180deg);
 }
 
+.action-btn li{
+  color: #666;
+}
+
 .accordion-content {
   padding: 0 1.25rem 1.25rem 1.25rem;
   animation: slideDown 0.3s ease;
