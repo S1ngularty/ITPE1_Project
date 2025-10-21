@@ -42,12 +42,26 @@ function SavedAnalyses() {
     });
   };
 
-  function actionEdit(e) {
-    console.log("edit button is clicked");
+  function actionEdit(id) {
+    axios
+      .post(
+        `${import.meta.env.VITE_APP_API}api/v1/saved/${id}`,
+        { analysesName: "table screw analysis" },
+        {
+          headers: { Authorization: `Bearer ${getToken()}` },
+        }
+      )
+      .then((response) => fetchSavedAnalyses())
+      .catch((error) => console.log(error));
   }
 
-  function actionDelete(e) {
-    console.log("delete btn is clicked");
+  function actionDelete(id) {
+    axios
+      .delete(`${import.meta.env.VITE_APP_API}api/v1/saved/${id}`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      })
+      .then((response) => fetchSavedAnalyses())
+      .catch((error) => console.log(error));
   }
 
   return (
@@ -66,9 +80,7 @@ function SavedAnalyses() {
                 className={`accordion-item ${
                   expandedId === item._id ? "expanded" : ""
                 }`}>
-                <div
-                  className="accordion-header"
-                  onClick={() => toggleAccordion(item._id)}>
+                <div className="accordion-header">
                   <div className="header-left">
                     <img
                       src={item.uploadedImage.url}
@@ -76,11 +88,7 @@ function SavedAnalyses() {
                       className="thumbnail"
                     />
                     <div className="header-info">
-                      <h3>
-                        {item.typeOfService === "classification"
-                          ? item.screw?.name
-                          : "Screw Count Analysis"}
-                      </h3>
+                      <h3>{item.name || "Unknown analysis"}</h3>
                       <p className="date">
                         Saved on {formatDate(item.createdAt)}
                       </p>
@@ -91,17 +99,18 @@ function SavedAnalyses() {
                     <span className="action-btn">
                       <li
                         className="fa fa-edit"
-                        onClick={(e) => actionEdit(e)}></li>
+                        onClick={(e) => actionEdit(item._id)}></li>
                     </span>
                     <span className="action-btn">
                       <li
                         className="fa fa-trash"
-                        onClick={(e) => actionDelete(e)}></li>
+                        onClick={(e) => actionDelete(item._id)}></li>
                     </span>
                     <span
                       className={`chevron ${
                         expandedId === item._id ? "rotate" : ""
-                      }`}>
+                      }`}
+                      onClick={() => toggleAccordion(item._id)}>
                       ▼
                     </span>
                   </div>

@@ -37,7 +37,7 @@ const dashboardInfo = async (user) => {
   ]);
 
   // console.log(history, requestUsage);
-  let isSave =[]
+  let isSave = [];
   let notSave = [];
 
   for (let activity of history) {
@@ -47,9 +47,22 @@ const dashboardInfo = async (user) => {
       continue;
     }
     notSave.push(activity);
-  }  
+  }
 
   return { activity: { isSave, notSave }, requestUsage };
 };
 
-module.exports = { saveUploads, fetchSaveAnalysis, dashboardInfo };
+const editSaveAnalyses = async (request) => {
+  const recordId = request.params.analysesRecordId;
+  const { userId } = request.user;
+  const { analysesName } = request.body;
+
+  const findRecord = await UserActivity.findById(recordId).exec();
+  if (!findRecord) throw new Error("cannot find the record on the collection");
+  if (analysesName) findRecord.name = analysesName;
+  await findRecord.save();
+
+  return findRecord;
+};
+
+module.exports = { saveUploads, fetchSaveAnalysis, dashboardInfo, editSaveAnalyses };

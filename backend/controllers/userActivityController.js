@@ -1,4 +1,5 @@
-const {saveUploads,dashboardInfo, fetchSaveAnalysis} = require("../services/userActivityService")
+const userActivity = require("../models/userActivity")
+const {saveUploads,dashboardInfo, fetchSaveAnalysis, editSaveAnalyses} = require("../services/userActivityService")
 
 
 const saveActivity = async(req,res)=>{
@@ -50,4 +51,20 @@ const fetchAnalysis= async(req,res)=>{
     }
 }
 
-module.exports = {saveActivity, fetchAnalysis, getDashboardInfo}
+const editRecordAnalyses = async(req,res)=>{
+    try {
+        const result = await editSaveAnalyses(req)
+        return res.status(200).json({
+            success:true,
+            result
+        })
+    } catch (error) {
+        console.log(error.message)
+        return res.status(500).json({
+            success:false,
+            error:error.message
+        })
+    }
+}
+
+module.exports = {saveActivity, fetchAnalysis, getDashboardInfo, editRecordAnalyses}

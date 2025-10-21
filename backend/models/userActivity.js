@@ -1,37 +1,43 @@
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 
-const userActivitySchema = new mongoose.Schema({
-    user:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"User",
-        required:true
+const userActivitySchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      default: `Analysis-${Date.now()}`,
+      unique:true
     },
-    screw:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"Screw",
-        default:null
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
-    typeOfService:{
-        type:String,
-        default: null,
-        enum:["classification","count"]
+    screw: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Screw",
+      default: null,
     },
-    saveStatus:{
-        type: Boolean,
-        default:false
+    typeOfService: {
+      type: String,
+      default: null,
+      enum: ["classification", "count"],
     },
-    uploadedImage:{
-        public_id:{
-            type:String,
-            required:true,
-        },
-        url:{
-            type:String,
-            required:true
-        }
-    }
+    saveStatus: {
+      type: Boolean,
+      default: false,
+    },
+    uploadedImage: {
+      public_id: {
+        type: String,
+        required: true,
+      },
+      url: {
+        type: String,
+        required: true,
+      },
+    },
+  },
+  { timestamps: true }
+);
 
-},
-{timestamps:true})
-
-module.exports = mongoose.model("UserActivity", userActivitySchema)
+module.exports = mongoose.model("UserActivity", userActivitySchema);
