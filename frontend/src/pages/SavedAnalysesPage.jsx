@@ -3,13 +3,18 @@ import { useNavigate } from "react-router-dom";
 import "../styles/pages/SaveAnalysesPage.css";
 import { getToken } from "../utils/authUtil";
 import axios from "axios";
-
+import NamingModal from "../components/Modal";
 import Navbar from "../components/layouts/Navbar";
 
 function SavedAnalyses() {
   const navigate = useNavigate();
   const [analyses, setAnalyses] = useState([]);
   const [expandedId, setExpandedId] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [currData, setCurrData] = useState({
+    id: "",
+    name: "",
+  });
 
   useEffect(() => {
     // Fetch saved analyses from backend
@@ -42,31 +47,43 @@ function SavedAnalyses() {
     });
   };
 
-  function actionEdit(id) {
-    axios
-      .post(
-        `${import.meta.env.VITE_APP_API}api/v1/saved/${id}`,
-        { analysesName: "table screw analysis" },
-        {
-          headers: { Authorization: `Bearer ${getToken()}` },
-        }
-      )
-      .then((response) => fetchSavedAnalyses())
-      .catch((error) => console.log(error));
+  function actionEdit(id, analysesName) {
+    // axios
+    //   .post(
+    //     `${import.meta.env.VITE_APP_API}api/v1/saved/${id}`,
+    //     { analysesName: "table screw analysis" },
+    //     {
+    //       headers: { Authorization: `Bearer ${getToken()}` },
+    //     }
+    //   )
+    //   .then((response) => fetchSavedAnalyses())
+    //   .catch((error) => console.log(error));
+    setCurrData({
+      ...currData,
+      id: id,
+      name: analysesName,
+    });
+    setShowModal(true);
+    return;
   }
 
   function actionDelete(id) {
-    axios
-      .delete(`${import.meta.env.VITE_APP_API}api/v1/saved/${id}`, {
-        headers: { Authorization: `Bearer ${getToken()}` },
-      })
-      .then((response) => fetchSavedAnalyses())
-      .catch((error) => console.log(error));
+    // axios
+    //   .delete(`${import.meta.env.VITE_APP_API}api/v1/saved/${id}`, {
+    //     headers: { Authorization: `Bearer ${getToken()}` },
+    //   })
+    //   .then((response) => fetchSavedAnalyses())
+    //   .catch((error) => console.log(error));
+  }
+
+  function closeModal (){
+    setShowModal(false)
   }
 
   return (
     <div className="saved-page">
       <Navbar />
+      {showModal && <NamingModal event={true} currValue={currData} toClose={closeModal}></NamingModal>}
       <main className="saved-main">
         <h1>Your Saved Analyses</h1>
 
@@ -99,7 +116,7 @@ function SavedAnalyses() {
                     <span className="action-btn">
                       <li
                         className="fa fa-edit"
-                        onClick={(e) => actionEdit(item._id)}></li>
+                        onClick={(e) => actionEdit(item._id, item.name)}></li>
                     </span>
                     <span className="action-btn">
                       <li
