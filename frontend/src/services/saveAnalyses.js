@@ -1,16 +1,23 @@
 import axios from "axios";
-
-const recordRename = async (data) => {
-  axios
-    .post(
+import { getToken } from "../utils/authUtil";
+const recordRename = async (name, id) => {
+  try {
+    const result = axios.post(
       `${import.meta.env.VITE_APP_API}api/v1/saved/${id}`,
-      { analysesName: "table screw analysis" },
+      { analysesName: name },
       {
         headers: { Authorization: `Bearer ${getToken()}` },
       }
-    )
-    .then((response) => fetchSavedAnalyses())
-    .catch((error) => console.log(error));
+    );
+    if(result instanceof Error) throw new Error("something went wrong")
+    return result;
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      error,
+    };
+  }
 };
 
 export { recordRename };

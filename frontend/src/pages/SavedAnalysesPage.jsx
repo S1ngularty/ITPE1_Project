@@ -5,6 +5,7 @@ import { getToken } from "../utils/authUtil";
 import axios from "axios";
 import NamingModal from "../components/Modal";
 import Navbar from "../components/layouts/Navbar";
+import notify from "../components/Toast"
 
 function SavedAnalyses() {
   const navigate = useNavigate();
@@ -66,6 +67,11 @@ function SavedAnalyses() {
     //   .catch((error) => console.log(error));
   }
 
+  async function onsubmitHandler (result){
+   if(result)fetchSavedAnalyses() 
+    notify("success","edit successful")
+  }
+
 
   return (
     <div className="saved-page">
@@ -73,7 +79,7 @@ function SavedAnalyses() {
           <NamingModal
             isOpen={true}
             onClose={() => setShowModal(false)}
-            currValue={currData}></NamingModal>
+            currValue={currData} onSubmit = {onsubmitHandler}></NamingModal>
         )}
       <Navbar />
       <main className="saved-main">
