@@ -16,6 +16,7 @@ import SavedAnalyses from "./pages/SavedAnalysesPage.jsx";
 import Profile from "./pages/Profle";
 import RecoveryPassword from "./pages/auth/RecoveryPassword.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
+import "./index.css";
 
 function App() {
   return (

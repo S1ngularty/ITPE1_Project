@@ -48,16 +48,6 @@ function SavedAnalyses() {
   };
 
   function actionEdit(id, analysesName) {
-    // axios
-    //   .post(
-    //     `${import.meta.env.VITE_APP_API}api/v1/saved/${id}`,
-    //     { analysesName: "table screw analysis" },
-    //     {
-    //       headers: { Authorization: `Bearer ${getToken()}` },
-    //     }
-    //   )
-    //   .then((response) => fetchSavedAnalyses())
-    //   .catch((error) => console.log(error));
     setCurrData({
       ...currData,
       id: id,
@@ -76,17 +66,18 @@ function SavedAnalyses() {
     //   .catch((error) => console.log(error));
   }
 
-  function closeModal (){
-    setShowModal(false)
-  }
 
   return (
     <div className="saved-page">
+       {showModal && (
+          <NamingModal
+            isOpen={true}
+            onClose={() => setShowModal(false)}
+            currValue={currData}></NamingModal>
+        )}
       <Navbar />
-      {showModal && <NamingModal event={true} currValue={currData} toClose={closeModal}></NamingModal>}
       <main className="saved-main">
         <h1>Your Saved Analyses</h1>
-
         {analyses.length === 0 ? (
           <p className="empty-msg">No saved analyses yet.</p>
         ) : (

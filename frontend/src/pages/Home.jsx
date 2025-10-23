@@ -23,7 +23,7 @@ function Home() {
       <Navbar searchKeyword={search} />
       <main className="main-content">
         <div className="welcome-section">
-          <h1>Welcome to ScrewIT, {name}!</h1>
+          <h1 className="text-3xl font-bold text-yellow-500">Welcome to ScrewIT, {name}!</h1>
           <p>
             Upload images to automatically classify and count screws. Preview,
             discover, and save your analyses with ease.
