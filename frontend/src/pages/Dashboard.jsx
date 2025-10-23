@@ -85,7 +85,7 @@ const Dashboard = () => {
         screwId: item.screw,
         classification: "Classification Result",
         date: item.createdAt.split("T")[0],
-        title: `Analysis ${item._id.slice(-6)}`,
+        title: `Analysis ${item.name}`,
       }));
 
     // Transform saved items
