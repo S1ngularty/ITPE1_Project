@@ -5,7 +5,7 @@ import { getToken } from "../utils/authUtil";
 import axios from "axios";
 import NamingModal from "../components/Modal";
 import Navbar from "../components/layouts/Navbar";
-import notify from "../components/Toast"
+import notify from "../components/Toast";
 import ConfirmationModal from "../components/ConfirmationModal";
 
 function SavedAnalyses() {
@@ -13,7 +13,7 @@ function SavedAnalyses() {
   const [analyses, setAnalyses] = useState([]);
   const [expandedId, setExpandedId] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [deleteModal, setDeleteModal] = useState(false)
+  const [deleteModal, setDeleteModal] = useState(false);
   const [currData, setCurrData] = useState({
     id: "",
     name: "",
@@ -61,28 +61,56 @@ function SavedAnalyses() {
   }
 
   function actionDelete(id) {
-    console.log(id)
-    setDeleteModal(true)
-    return
+    // console.log(id);
+    setCurrData({
+      ...currData,id:id
+    })
+    setDeleteModal(true);
+    return;
   }
 
-  async function onsubmitHandler (result){
-   if(result)fetchSavedAnalyses() 
-    notify("success","edit successful")
+  async function onsubmitHandler(result) {
+    if (result) fetchSavedAnalyses();
+    notify("success", "edit successful");
   }
 
+  async function deleteRecord() {
+    if(!currData.id) return
+    axios
+      .post(`${import.meta.env.VITE_APP_API}api/v1/unsaved`, {
+        analysesRecordId: currData.id,
+      },{
+        headers:{
+          Authorization: `Bearer ${getToken()}`
+        }
+      })
+      .then((response) => {
+        notify("success","unsaved successful")
+        setDeleteModal(false)
+        fetchSavedAnalyses();
+      })
+      .catch((error) => {
+        console.log(error);
+        notify("error", error.message);
+      });
+  }
 
   return (
     <div className="saved-page">
       {deleteModal && (
-        <ConfirmationModal show={true} onClose={()=>setDeleteModal(false)} />
+        <ConfirmationModal
+          show={true}
+          onClose={() => setDeleteModal(false)}
+          onConfirm={deleteRecord}
+        />
       )}
-       {showModal && (
-          <NamingModal
-            isOpen={true}
-            onClose={() => setShowModal(false)}
-            currValue={currData} onSubmit = {onsubmitHandler}></NamingModal>
-        )}
+      {showModal && (
+        <NamingModal
+          isOpen={true}
+          onClose={() => setShowModal(false)}
+          currValue={currData}
+          onSubmit={onsubmitHandler}></NamingModal>
+      )}
       <Navbar />
       <main className="saved-main">
         <h1>Your Saved Analyses</h1>

@@ -25,6 +25,7 @@ router.post("/reset-password/:token",userController.recovery_setNewPassword)
 router.get("/getDashboard",authMiddleware.verifyToken, userActivityController.getDashboardInfo)
 
 router.post("/saved/:analysesRecordId",authMiddleware.verifyToken,userActivityController.editRecordAnalyses)
+router.post("/unsaved",authMiddleware.verifyToken,userActivityController.unsaveRecordAnalyses)
 
 
 

@@ -65,4 +65,20 @@ const editSaveAnalyses = async (request) => {
   return findRecord;
 };
 
-module.exports = { saveUploads, fetchSaveAnalysis, dashboardInfo, editSaveAnalyses };
+const unsavedAnalyses = async (request) => {
+  const { analysesRecordId } = request.body;
+  if (!analysesRecordId) throw new Error("undefined record id");
+  const record = await UserActivity.findById(analysesRecordId).exec();
+  if (!record) throw new Error("failed to find the record in the collection");
+  record.saveStatus = false;
+  await record.save();
+  return record;
+};
+
+module.exports = {
+  saveUploads,
+  fetchSaveAnalysis,
+  dashboardInfo,
+  editSaveAnalyses,
+  unsavedAnalyses
+};
