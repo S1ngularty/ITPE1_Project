@@ -6,12 +6,14 @@ import axios from "axios";
 import NamingModal from "../components/Modal";
 import Navbar from "../components/layouts/Navbar";
 import notify from "../components/Toast"
+import ConfirmationModal from "../components/ConfirmationModal";
 
 function SavedAnalyses() {
   const navigate = useNavigate();
   const [analyses, setAnalyses] = useState([]);
   const [expandedId, setExpandedId] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [deleteModal, setDeleteModal] = useState(false)
   const [currData, setCurrData] = useState({
     id: "",
     name: "",
@@ -59,12 +61,9 @@ function SavedAnalyses() {
   }
 
   function actionDelete(id) {
-    // axios
-    //   .delete(`${import.meta.env.VITE_APP_API}api/v1/saved/${id}`, {
-    //     headers: { Authorization: `Bearer ${getToken()}` },
-    //   })
-    //   .then((response) => fetchSavedAnalyses())
-    //   .catch((error) => console.log(error));
+    console.log(id)
+    setDeleteModal(true)
+    return
   }
 
   async function onsubmitHandler (result){
@@ -75,6 +74,9 @@ function SavedAnalyses() {
 
   return (
     <div className="saved-page">
+      {deleteModal && (
+        <ConfirmationModal show={true} onClose={()=>setDeleteModal(false)} />
+      )}
        {showModal && (
           <NamingModal
             isOpen={true}
