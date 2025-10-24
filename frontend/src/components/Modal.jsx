@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import "../styles/components/modal.css"
 import { recordRename } from '../services/saveAnalyses';
-const NamingModal = ({ isOpen, onClose, currValue, onSubmit }) => {
+const NamingModal = ({ isOpen, onClose, currValue, onSubmit, alreadySaved }) => {
   const inputRef = useRef(null);
   const modalRef = useRef(null);
 
@@ -35,10 +35,12 @@ const NamingModal = ({ isOpen, onClose, currValue, onSubmit }) => {
   const handleSubmit = async(e) => {
     e.preventDefault();
     const value = inputRef.current.value.trim();
-    if (value) {
+    if (alreadySaved && value) {
         const res = await recordRename(value,currValue.id)
         if(res) onSubmit(res)
             onClose()
+    }else if(!alreadySaved && value){
+       onSubmit(value)
     }
   };
 

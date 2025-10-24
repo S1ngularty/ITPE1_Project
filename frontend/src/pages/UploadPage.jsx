@@ -6,6 +6,8 @@ import { toast } from "react-toastify";
 import { getToken } from "../utils/authUtil";
 import notify from "../components/Toast";
 import Navbar from "../components/layouts/Navbar";
+import NamingModal from "../components/Modal";
+
 function UploadPage() {
   const navigate = useNavigate();
   const [selectedFile, setSelectedFile] = useState(null);
@@ -14,6 +16,7 @@ function UploadPage() {
   const [results, setResults] = useState(null);
   const [mode, setMode] = useState("classify");
   const [loadingSave, setLoadingSave] = useState(false);
+  const [showModal, setShowModal] = useState(false)
   const [saveData, setSaveData] = useState("");
 
   // useEffect(()=>{
@@ -77,16 +80,20 @@ function UploadPage() {
         "Error analyzing image:",
         err.response?.data || err.message
       );
-      notify("error","Failed to analyze image. Something went wrong, Please try again later");
+      notify(
+        "error",
+        "Failed to analyze image. Something went wrong, Please try again later"
+      );
     } finally {
       setLoading(false);
     }
   }
 
-  async function handleSave() {
-    // console.log(results.result._id)
+  async function handleSave(name) {
+    console.log(saveData)
     setLoadingSave(true);
-    const data = { activityID: saveData } || {};
+    const data = { activityID: saveData, name} ;
+    console.log (data)
     axios
       .post(`${import.meta.env.VITE_APP_API}api/v1/saveActivity`, data, {
         headers: {
@@ -96,10 +103,12 @@ function UploadPage() {
       })
       .then((response) => {
         setLoadingSave(false);
-        notify("success","analysis is saved successfully")
+        setShowModal(false)
+        notify("success", "analysis is saved successfully");
       })
-      .catch((error) =>{
-        notify("warning",error.message)
+      .catch((error) => {
+        notify("error", error.message);
+        setLoading(false)
         console.log(error.message);
       });
   }
@@ -224,7 +233,8 @@ function UploadPage() {
 
   return (
     <div className="upload-page">
-      <Navbar/>
+      <Navbar />
+      {showModal && <NamingModal isOpen={true} onClose={()=>setShowModal(false)} currValue={`Analysis-${Date.now()}`} onSubmit={handleSave} alreadySaved={false}></NamingModal>}
       {/* Main Content - Horizontal Layout */}
       <main className="upload-main-horizontal">
         {/* Left Section - Image Upload */}
@@ -240,8 +250,7 @@ function UploadPage() {
                   height="48"
                   viewBox="0 0 24 24"
                   fill="none"
-                  stroke="currentColor"
-                >
+                  stroke="currentColor">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                   <polyline points="17 8 12 3 7 8" />
                   <line x1="12" y1="3" x2="12" y2="15" />
@@ -273,8 +282,7 @@ function UploadPage() {
               <div className="mode-buttons">
                 <button
                   className={`mode-btn ${mode === "classify" ? "active" : ""}`}
-                  onClick={() => setMode("classify")}
-                >
+                  onClick={() => setMode("classify")}>
                   <span className="mode-icon">🔍</span>
                   <span className="mode-text">
                     <strong>Classification</strong>
@@ -283,8 +291,7 @@ function UploadPage() {
                 </button>
                 <button
                   className={`mode-btn ${mode === "count" ? "active" : ""}`}
-                  onClick={() => setMode("count")}
-                >
+                  onClick={() => setMode("count")}>
                   <span className="mode-icon">🔢</span>
                   <span className="mode-text">
                     <strong>Counting</strong>
@@ -298,8 +305,7 @@ function UploadPage() {
             <button
               onClick={handleAnalyze}
               disabled={loading || !selectedFile}
-              className="analyze-btn"
-            >
+              className="analyze-btn">
               {loading ? (
                 <>
                   <div className="btn-spinner"></div>
@@ -353,10 +359,9 @@ function UploadPage() {
                   </div>
                 )}
                 <button
-                  onClick={handleSave}
+                  onClick={()=>setShowModal(true)}
                   disabled={loadingSave}
-                  className="save-btn"
-                >
+                  className="save-btn">
                   {loadingSave ? "Saving..." : "💾 Save Result"}
                 </button>
               </div>

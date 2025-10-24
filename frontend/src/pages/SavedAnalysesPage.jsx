@@ -109,6 +109,7 @@ function SavedAnalyses() {
           isOpen={true}
           onClose={() => setShowModal(false)}
           currValue={currData}
+          alreadySaved={true}
           onSubmit={onsubmitHandler}></NamingModal>
       )}
       <Navbar />
