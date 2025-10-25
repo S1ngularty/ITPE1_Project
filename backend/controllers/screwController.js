@@ -25,3 +25,17 @@ exports.fetchScrews= async(req,res)=>{
     });
   }
 }
+
+exports.getScrewById= async(req,res)=>{
+ try {
+    const result = await screwService.getSpecificScrew(req);
+    return res.status(200).json({ success: true, result });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+}
+

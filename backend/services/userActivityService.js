@@ -11,7 +11,7 @@ const saveUploads = async (request) => {
   if (!request.body) throw new Error("empty request");
   const { activityID, name } = request.body;
   if (!activityID) throw new Error("screw ID is indefined");
-  if (!name) throw new Error("name is indefined");
+  if (!name) throw new Error("name is indefined");  
 
   console.log(activityID);
   const updateActivity = await UserActivity.findById(activityID).exec();
