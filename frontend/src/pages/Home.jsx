@@ -2,11 +2,11 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/pages/Home.css";
 import Navbar from "../components/layouts/Navbar";
-
+import ModalPreview from "../components/PreviewModal";
 import useHome from "../hooks/useHome";
 
 function Home() {
-  const { screws, name, error, search } = useHome();
+  const { screws, name, error, search,selectedScrew,setSelectedScrew } = useHome();
 
   const navigate = useNavigate();
 
@@ -18,9 +18,14 @@ function Home() {
     navigate("../save-analyses");
   }
 
+  function handlePreview(screwId){
+
+  }
+
   return (
     <div className="home-page">
       <Navbar searchKeyword={search} />
+      {selectedScrew && <ModalPreview id={selectedScrew} isOpen={true} onClose={()=>setSelectedScrew("")}></ModalPreview>}
       <main className="main-content">
         <div className="welcome-section">
           <h1 className="text-3xl font-bold text-yellow-500">Welcome to ScrewIT, {name}!</h1>
@@ -49,7 +54,7 @@ function Home() {
           <div className="recent-grid">
             {screws ? (
               screws.map((screw) => (
-                <div key={screw._id} className="screw-card">
+                <div key={screw._id} className="screw-card" onClick={()=>setSelectedScrew(screw._id)}>
                   <div className="screw-image">
                     {/* Add image if available, otherwise use placeholder */}
                     <img
