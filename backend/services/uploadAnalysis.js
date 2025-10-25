@@ -1,4 +1,4 @@
-const UserActivity = require("../models/userActivity");
+const UploadAnalysis = require("../models/uploadAnalysis");
 const { uploadToCloudinary, singleImage } = require("../utils/cloudinary");
 
 const recentUploads = async (request) => {
@@ -11,10 +11,10 @@ const saveUploads = async (request) => {
   if (!request.body) throw new Error("empty request");
   const { activityID, name } = request.body;
   if (!activityID) throw new Error("screw ID is indefined");
-  if (!name) throw new Error("name is indefined");  
+  if (!name) throw new Error("name is indefined");
 
   console.log(activityID);
-  const updateActivity = await UserActivity.findById(activityID).exec();
+  const updateActivity = await UploadAnalysis.findById(activityID).exec();
   updateActivity.saveStatus = true;
   updateActivity.name = name;
   updateActivity.save();
@@ -24,7 +24,7 @@ const saveUploads = async (request) => {
 };
 
 const fetchSaveAnalysis = async () => {
-  const savedAnalysis = await UserActivity.find({ saveStatus: true })
+  const savedAnalysis = await UploadAnalysis.find({ saveStatus: true })
     .populate("user screw")
     .exec();
   if (savedAnalysis.length < 1) throw new Error("No saved analysis yet");
@@ -60,7 +60,7 @@ const editSaveAnalyses = async (request) => {
   const { userId } = request.user;
   const { analysesName } = request.body;
 
-  const findRecord = await UserActivity.findById(recordId).exec();
+  const findRecord = await UploadAnalysis.findById(recordId).exec();
   if (!findRecord) throw new Error("cannot find the record on the collection");
   if (analysesName) findRecord.name = analysesName;
   await findRecord.save();
@@ -71,7 +71,7 @@ const editSaveAnalyses = async (request) => {
 const unsavedAnalyses = async (request) => {
   const { analysesRecordId } = request.body;
   if (!analysesRecordId) throw new Error("undefined record id");
-  const record = await UserActivity.findById(analysesRecordId).exec();
+  const record = await UploadAnalysis.findById(analysesRecordId).exec();
   if (!record) throw new Error("failed to find the record in the collection");
   record.saveStatus = false;
   await record.save();

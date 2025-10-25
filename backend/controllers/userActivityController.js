@@ -1,12 +1,10 @@
-const { set } = require("../config/nodemailer");
-const userActivity = require("../models/userActivity");
 const {
   saveUploads,
   dashboardInfo,
   fetchSaveAnalysis,
   editSaveAnalyses,
   unsavedAnalyses
-} = require("../services/userActivityService");
+} = require("../services/uploadAnalysis");
 
 const saveActivity = async (req, res) => {
   try {
