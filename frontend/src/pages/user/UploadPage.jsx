@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import "../styles/pages/UploadPage.css";
+import "../../styles/user/pages/UploadPage.css";
 import { toast } from "react-toastify";
-import { getToken } from "../utils/authUtil";
-import notify from "../components/Toast";
-import Navbar from "../components/layouts/Navbar";
-import NamingModal from "../components/Modal";
+import { getToken } from "../../utils/authUtil";
+import notify from "../../components/user/Toast";
+import Navbar from "../../components/user/layouts/Navbar";
+import NamingModal from "../../components/user/Modal";
 
 function UploadPage() {
   const navigate = useNavigate();
@@ -16,7 +16,7 @@ function UploadPage() {
   const [results, setResults] = useState(null);
   const [mode, setMode] = useState("classify");
   const [loadingSave, setLoadingSave] = useState(false);
-  const [showModal, setShowModal] = useState(false)
+  const [showModal, setShowModal] = useState(false);
   const [saveData, setSaveData] = useState("");
 
   // useEffect(()=>{
@@ -90,10 +90,10 @@ function UploadPage() {
   }
 
   async function handleSave(name) {
-    console.log(saveData)
+    console.log(saveData);
     setLoadingSave(true);
-    const data = { activityID: saveData, name} ;
-    console.log (data)
+    const data = { activityID: saveData, name };
+    console.log(data);
     axios
       .post(`${import.meta.env.VITE_APP_API}api/v1/saveActivity`, data, {
         headers: {
@@ -103,12 +103,12 @@ function UploadPage() {
       })
       .then((response) => {
         setLoadingSave(false);
-        setShowModal(false)
+        setShowModal(false);
         notify("success", "analysis is saved successfully");
       })
       .catch((error) => {
         notify("error", error.message);
-        setLoading(false)
+        setLoading(false);
         console.log(error.message);
       });
   }
@@ -234,7 +234,14 @@ function UploadPage() {
   return (
     <div className="upload-page">
       <Navbar />
-      {showModal && <NamingModal isOpen={true} onClose={()=>setShowModal(false)} currValue={`Analysis-${Date.now()}`} onSubmit={handleSave} alreadySaved={false}></NamingModal>}
+      {showModal && (
+        <NamingModal
+          isOpen={true}
+          onClose={() => setShowModal(false)}
+          currValue={`Analysis-${Date.now()}`}
+          onSubmit={handleSave}
+          alreadySaved={false}></NamingModal>
+      )}
       {/* Main Content - Horizontal Layout */}
       <main className="upload-main-horizontal">
         {/* Left Section - Image Upload */}
@@ -359,7 +366,7 @@ function UploadPage() {
                   </div>
                 )}
                 <button
-                  onClick={()=>setShowModal(true)}
+                  onClick={() => setShowModal(true)}
                   disabled={loadingSave}
                   className="save-btn">
                   {loadingSave ? "Saving..." : "💾 Save Result"}

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/pages/SaveAnalysesPage.css";
-import { getToken } from "../utils/authUtil";
+import "../../styles/user/pages/SaveAnalysesPage.css";
+import { getToken } from "../../utils/authUtil";
 import axios from "axios";
-import NamingModal from "../components/Modal";
-import Navbar from "../components/layouts/Navbar";
-import notify from "../components/Toast";
-import ConfirmationModal from "../components/ConfirmationModal";
+import NamingModal from "../../components/user/Modal";
+import Navbar from "../../components/user/layouts/Navbar";
+import notify from "../../components/user/Toast";
+import ConfirmationModal from "../../components/user/ConfirmationModal";
 
 function SavedAnalyses() {
   const navigate = useNavigate();
@@ -63,8 +63,9 @@ function SavedAnalyses() {
   function actionDelete(id) {
     // console.log(id);
     setCurrData({
-      ...currData,id:id
-    })
+      ...currData,
+      id: id,
+    });
     setDeleteModal(true);
     return;
   }
@@ -75,18 +76,22 @@ function SavedAnalyses() {
   }
 
   async function deleteRecord() {
-    if(!currData.id) return
+    if (!currData.id) return;
     axios
-      .post(`${import.meta.env.VITE_APP_API}api/v1/unsaved`, {
-        analysesRecordId: currData.id,
-      },{
-        headers:{
-          Authorization: `Bearer ${getToken()}`
+      .post(
+        `${import.meta.env.VITE_APP_API}api/v1/unsaved`,
+        {
+          analysesRecordId: currData.id,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
         }
-      })
+      )
       .then((response) => {
-        notify("success","unsaved successful")
-        setDeleteModal(false)
+        notify("success", "unsaved successful");
+        setDeleteModal(false);
         fetchSavedAnalyses();
       })
       .catch((error) => {

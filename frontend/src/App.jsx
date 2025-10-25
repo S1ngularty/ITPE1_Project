@@ -6,16 +6,16 @@ import "react-toastify/dist/ReactToastify.css";
 
 import { getToken } from "./utils/authUtil";
 
-import Navbar from "./components/layouts/Navbar";
+import Navbar from "./components/user/layouts/Navbar.jsx";
 import Login from "./pages/auth/login";
 import Register from "./pages/auth/register";
-import UploadPage from "./pages/UploadPage";
+import UploadPage from "./pages/user/UploadPage";
 import PrivateRoute from "./PrivateRoute";
-import Home from "./pages/Home";
-import SavedAnalyses from "./pages/SavedAnalysesPage.jsx";
-import Profile from "./pages/Profle";
+import Home from "./pages/user/Home";
+import SavedAnalyses from "./pages/user/SavedAnalysesPage.jsx";
+import Profile from "./pages/user/Profle";
 import RecoveryPassword from "./pages/auth/RecoveryPassword.jsx";
-import Dashboard from "./pages/Dashboard.jsx";
+import Dashboard from "./pages/user/Dashboard.jsx";
 import "./index.css";
 
 function App() {

@@ -1,12 +1,13 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/pages/Home.css";
-import Navbar from "../components/layouts/Navbar";
-import ModalPreview from "../components/PreviewModal";
-import useHome from "../hooks/useHome";
+import "../../styles/user/pages/Home.css";
+import Navbar from "../../components/user/layouts/Navbar";
+import ModalPreview from "../../components/user/PreviewModal";
+import useHome from "../../hooks/user/useHome";
 
 function Home() {
-  const { screws, name, error, search,selectedScrew,setSelectedScrew } = useHome();
+  const { screws, name, error, search, selectedScrew, setSelectedScrew } =
+    useHome();
 
   const navigate = useNavigate();
 
@@ -18,17 +19,22 @@ function Home() {
     navigate("../save-analyses");
   }
 
-  function handlePreview(screwId){
-
-  }
+  function handlePreview(screwId) {}
 
   return (
     <div className="home-page">
       <Navbar searchKeyword={search} />
-      {selectedScrew && <ModalPreview id={selectedScrew} isOpen={true} onClose={()=>setSelectedScrew("")}></ModalPreview>}
+      {selectedScrew && (
+        <ModalPreview
+          id={selectedScrew}
+          isOpen={true}
+          onClose={() => setSelectedScrew("")}></ModalPreview>
+      )}
       <main className="main-content">
         <div className="welcome-section">
-          <h1 className="text-3xl font-bold text-yellow-500">Welcome to ScrewIT, {name}!</h1>
+          <h1 className="text-3xl font-bold text-yellow-500">
+            Welcome to ScrewIT, {name}!
+          </h1>
           <p>
             Upload images to automatically classify and count screws. Preview,
             discover, and save your analyses with ease.
@@ -54,7 +60,10 @@ function Home() {
           <div className="recent-grid">
             {screws ? (
               screws.map((screw) => (
-                <div key={screw._id} className="screw-card" onClick={()=>setSelectedScrew(screw._id)}>
+                <div
+                  key={screw._id}
+                  className="screw-card"
+                  onClick={() => setSelectedScrew(screw._id)}>
                   <div className="screw-image">
                     {/* Add image if available, otherwise use placeholder */}
                     <img

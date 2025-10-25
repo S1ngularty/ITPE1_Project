@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { X, Heart, ChevronLeft, ChevronRight } from "lucide-react";
-import "../styles/pages/PreviewModal.css";
+import "../../styles/user/pages/PreviewModal.css";
 
 const ScrewPreviewModal = ({ id, onClose }) => {
   const [screw, setScrew] = useState(null);

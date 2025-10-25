@@ -2,8 +2,8 @@ import React from "react";
 import { useState, useEffect } from "react";
 import {useNavigate} from "react-router-dom"
 import axios from "axios"
-import notify  from "../../components/Toast"
-import "../../styles/pages/auth/recoveryPassword.css"
+import notify  from "../../components/user/Toast"
+import "../../styles/user/pages/auth/recoveryPassword.css"
 
 function RecoveryPassword (){
     const searchParams = new URLSearchParams(location.search)

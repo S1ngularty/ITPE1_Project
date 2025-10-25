@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/pages/Profile.css";
-import Navbar from "../components/layouts/Navbar";
+import "../../styles/user/pages/Profile.css";
+import Navbar from "../../components/user/layouts/Navbar";
 
 import axios from "axios";
-import { getToken } from "../utils/authUtil";
-import notify from "../components/Toast";
+import { getToken } from "../../utils/authUtil";
+import notify from "../../components/user/Toast";
 
 function Profile() {
   const navigate = useNavigate();
@@ -67,7 +67,7 @@ function Profile() {
         notify("success", "profile is updated successfully");
       })
       .catch((error) => {
-        notify("warning",error.message)
+        notify("warning", error.message);
         console.log(error.message);
       });
   }
@@ -90,11 +90,12 @@ function Profile() {
           },
         }
       )
-      .then((response) => {fetchProfile()
-        notify("success","password is saved successfully")
+      .then((response) => {
+        fetchProfile();
+        notify("success", "password is saved successfully");
       })
       .catch((error) => {
-        notify("warning",error.message)
+        notify("warning", error.message);
         console.log(error.message);
       });
     setMessage("Password updated successfully (placeholder).");

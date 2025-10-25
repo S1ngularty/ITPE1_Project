@@ -1,8 +1,14 @@
-import React, { useEffect, useRef } from 'react';
-import { createPortal } from 'react-dom';
-import "../styles/components/modal.css"
-import { recordRename } from '../services/saveAnalyses';
-const NamingModal = ({ isOpen, onClose, currValue, onSubmit, alreadySaved }) => {
+import React, { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
+import "../../styles/user/components/modal.css";
+import { recordRename } from "../../services/user/saveAnalyses";
+const NamingModal = ({
+  isOpen,
+  onClose,
+  currValue,
+  onSubmit,
+  alreadySaved,
+}) => {
   const inputRef = useRef(null);
   const modalRef = useRef(null);
 
@@ -16,12 +22,12 @@ const NamingModal = ({ isOpen, onClose, currValue, onSubmit, alreadySaved }) => 
   // Handle Escape key
   useEffect(() => {
     const handleEscape = (e) => {
-      if (e.key === 'Escape' && isOpen) {
+      if (e.key === "Escape" && isOpen) {
         onClose();
       }
     };
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
   }, [isOpen, onClose]);
 
   // Handle click outside
@@ -32,15 +38,15 @@ const NamingModal = ({ isOpen, onClose, currValue, onSubmit, alreadySaved }) => 
   };
 
   // Handle form submission
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const value = inputRef.current.value.trim();
     if (alreadySaved && value) {
-        const res = await recordRename(value,currValue.id)
-        if(res) onSubmit(res)
-            onClose()
-    }else if(!alreadySaved && value){
-       onSubmit(value)
+      const res = await recordRename(value, currValue.id);
+      if (res) onSubmit(res);
+      onClose();
+    } else if (!alreadySaved && value) {
+      onSubmit(value);
     }
   };
 
@@ -52,15 +58,14 @@ const NamingModal = ({ isOpen, onClose, currValue, onSubmit, alreadySaved }) => 
       <div className="modal-content" ref={modalRef}>
         <div className="modal-header">
           <h3 className="modal-title">Name Your Analysis</h3>
-          <button 
-            className="modal-close-btn" 
+          <button
+            className="modal-close-btn"
             onClick={onClose}
-            aria-label="Close modal"
-          >
+            aria-label="Close modal">
             ×
           </button>
         </div>
-        
+
         <div onSubmit={handleSubmit}>
           <div className="modal-body">
             <label htmlFor="analysis-name" className="modal-label">
@@ -71,29 +76,27 @@ const NamingModal = ({ isOpen, onClose, currValue, onSubmit, alreadySaved }) => 
               type="text"
               id="analysis-name"
               className="modal-input"
-              defaultValue={currValue.name || ''}
+              defaultValue={currValue.name || ""}
               placeholder="Enter analysis name..."
               onKeyPress={(e) => {
-                if (e.key === 'Enter') {
+                if (e.key === "Enter") {
                   handleSubmit(e);
                 }
               }}
             />
           </div>
-          
+
           <div className="modal-footer">
-            <button 
-              type="button" 
+            <button
+              type="button"
               className="modal-btn modal-btn-cancel"
-              onClick={onClose}
-            >
+              onClick={onClose}>
               Cancel
             </button>
-            <button 
-              type="button" 
+            <button
+              type="button"
               className="modal-btn modal-btn-submit"
-              onClick={handleSubmit}
-            >
+              onClick={handleSubmit}>
               Save
             </button>
           </div>
