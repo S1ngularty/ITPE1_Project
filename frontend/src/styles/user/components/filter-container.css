@@ -1,0 +1,104 @@
+.filter-container {
+  position: absolute;
+  top: 60px;
+  right: -230px;
+  background: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  width: 250px;
+  z-index: 1000;
+  animation: dropdownFade 0.2s ease-in-out;
+}
+
+@keyframes dropdownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.filter-container h4 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.filter-container label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+  color: #333;
+}
+
+.filter-container select,
+.filter-container input {
+  margin-top: 4px;
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  outline: none;
+  font-size: 0.9rem;
+}
+
+.filter-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+.apply-btn,
+.reset-btn {
+  flex: 1;
+  padding: 6px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: 0.2s;
+  border: none;
+}
+
+.apply-btn {
+  background: #007bff;
+  color: #fff;
+  margin-right: 8px;
+}
+
+.apply-btn:hover {
+  background: #0056b3;
+}
+
+.reset-btn {
+  background: #eee;
+}
+
+.reset-btn:hover {
+  background: #ddd;
+}
+
+/* Filter icon beside search bar */
+.filter-button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  margin-left: 8px;
+  padding: 4px;
+  border-radius: 6px;
+  transition: 0.2s;
+}
+
+.filter-button:hover {
+  background-color: #f2f2f2;
+}
+
+.navbar-center {
+  display: flex;
+  align-items: center;
+  position: relative;
+}

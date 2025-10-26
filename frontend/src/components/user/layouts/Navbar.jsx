@@ -1,12 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../../../styles/user/components/navbar.css";
 import SearchBar from "../search-bar";
 import useNavbar from "../../../hooks/user/useNavbar";
 import ConfirmationModal from "../ConfirmationModal";
+import FilterContainer from "../FilterContainer";
+import { Filter } from "lucide-react";
 
 function Navbar({ searchKeyword }) {
   const { isLogin, setShowModal, showModal } = useNavbar();
+  const [showFilter, setShowFilter] = useState(false);
   const navigate = useNavigate();
 
   function handleLogout() {
@@ -26,14 +29,26 @@ function Navbar({ searchKeyword }) {
           mode={"logout"}
           onClose={() => setShowModal(false)}
           onConfirm={handleLogout}
-        ></ConfirmationModal>
+        />
       )}
+
       <div className="navbar-logo">
         <span className="navbar-icon">⚙</span> ScrewIT
       </div>
-      <SearchBar
-        keyword={typeof searchKeyword === "function" ? searchKeyword : null}
-      />
+
+      <div className="navbar-center">
+        <SearchBar
+          keyword={typeof searchKeyword === "function" ? searchKeyword : null}
+        />
+        <button
+          className="filter-button"
+          onClick={() => setShowFilter((prev) => !prev)}
+        >
+          <Filter size={20} />
+        </button>
+        {showFilter && <FilterContainer />}
+      </div>
+
       {isLogin && (
         <div className="navbar-links">
           <Link to="/home" className="navbar-link">
@@ -53,7 +68,7 @@ function Navbar({ searchKeyword }) {
 
       <button
         className="navbar-button"
-        onClick={isLogin ? ()=>setShowModal(true) : handleLogin}
+        onClick={isLogin ? () => setShowModal(true) : handleLogin}
       >
         {isLogin ? "Logout" : "Sign in"}
       </button>
