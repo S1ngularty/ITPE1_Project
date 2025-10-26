@@ -11,15 +11,20 @@ const ScrewPreviewModal = ({ id, onClose }) => {
 
   const fetchScrew = async () => {
     try {
+      let isAuthenticated = getToken()
+        ? {
+            headers: {
+              Authorization: `Bearer ${getToken()}`,
+            },
+          }
+        : {};
+
       const res = await fetch(
         `${import.meta.env.VITE_APP_API}api/v1/screw/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${getToken()}`,
-          },
-        }
+        isAuthenticated
       );
       const data = await res.json();
+      console.log(data.result)
       setScrew(data.result.screw);
       if (data.result.isSaved) setFavorited(true);
     } catch (err) {
@@ -138,13 +143,15 @@ const ScrewPreviewModal = ({ id, onClose }) => {
               onClick={toggleFavorite}
               aria-label={
                 favorited ? "Remove from favorites" : "Add to favorites"
-              }>
+              }
+            >
               <Heart size={20} fill={favorited ? "currentColor" : "none"} />
             </button>
             <button
               className="modal-btn close-btn"
               onClick={onClose}
-              aria-label="Close modal">
+              aria-label="Close modal"
+            >
               <X size={22} />
             </button>
           </div>
@@ -158,7 +165,8 @@ const ScrewPreviewModal = ({ id, onClose }) => {
               <button
                 className="nav-btn left"
                 onClick={prevImage}
-                aria-label="Previous image">
+                aria-label="Previous image"
+              >
                 <ChevronLeft size={24} />
               </button>
 
@@ -182,7 +190,8 @@ const ScrewPreviewModal = ({ id, onClose }) => {
               <button
                 className="nav-btn right"
                 onClick={nextImage}
-                aria-label="Next image">
+                aria-label="Next image"
+              >
                 <ChevronRight size={24} />
               </button>
             </div>

@@ -28,17 +28,21 @@ exports.getScrews = async (queryStr) => {
 exports.getSpecificScrew = async (request) => {
   if (!request.params) throw new Error("undefined parameter");
   const { screwId } = request.params;
-  const screw = await Screw.findById(screwId).exec();
-
-  const getSave = await SavedScrew.find({ user: request.user.userId }).exec();
   let isSaved = false;
 
-  for (let item of getSave[0].savedScrews) {
-    if (screw._id.equals(item.screwId)) isSaved = true;
+  const screw = await Screw.findById(screwId).exec();
+  if (!screw) throw new Error("screw does not exist on the database");
+
+  let getSave = null;
+  if (request.user!== null) {
+    getSave = await SavedScrew.find({ user: request.user.userId }).exec();
+
+    for (let item of getSave[0].savedScrews) {
+      if (screw._id.equals(item.screwId)) isSaved = true;
+    }
   }
 
   const result = { screw, isSaved };
 
-  if (!result) throw new Error("screw does not exist on the database");
   return result;
 };

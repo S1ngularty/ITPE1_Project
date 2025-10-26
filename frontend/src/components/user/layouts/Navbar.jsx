@@ -10,7 +10,7 @@ function Navbar({ searchKeyword }) {
 
   function handleLogout() {
     localStorage.removeItem("token");
-    navigate("/login");
+    navigate("/");
   }
 
   function handleLogin(){
