@@ -104,6 +104,7 @@ function SavedAnalyses() {
     <div className="saved-page">
       {deleteModal && (
         <ConfirmationModal
+          mode ={"delete"}
           show={true}
           onClose={() => setDeleteModal(false)}
           onConfirm={deleteRecord}

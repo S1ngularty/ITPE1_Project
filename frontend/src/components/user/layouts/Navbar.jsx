@@ -3,9 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import "../../../styles/user/components/navbar.css";
 import SearchBar from "../search-bar";
 import useNavbar from "../../../hooks/user/useNavbar";
+import ConfirmationModal from "../ConfirmationModal";
 
 function Navbar({ searchKeyword }) {
-  const { isLogin } = useNavbar();
+  const { isLogin, setShowModal, showModal } = useNavbar();
   const navigate = useNavigate();
 
   function handleLogout() {
@@ -13,12 +14,20 @@ function Navbar({ searchKeyword }) {
     navigate("/");
   }
 
-  function handleLogin(){
-    navigate("/login")
+  function handleLogin() {
+    navigate("/login");
   }
 
   return (
     <nav className="navbar">
+      {showModal && (
+        <ConfirmationModal
+          show={true}
+          mode={"logout"}
+          onClose={() => setShowModal(false)}
+          onConfirm={handleLogout}
+        ></ConfirmationModal>
+      )}
       <div className="navbar-logo">
         <span className="navbar-icon">⚙</span> ScrewIT
       </div>
@@ -42,7 +51,10 @@ function Navbar({ searchKeyword }) {
         </div>
       )}
 
-      <button className="navbar-button" onClick={isLogin ? handleLogout : handleLogin}>
+      <button
+        className="navbar-button"
+        onClick={isLogin ? ()=>setShowModal(true) : handleLogin}
+      >
         {isLogin ? "Logout" : "Sign in"}
       </button>
     </nav>
