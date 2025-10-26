@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { X, Heart, ChevronLeft, ChevronRight } from "lucide-react";
 import "../../styles/user/pages/PreviewModal.css";
+import { getToken } from "../../utils/authUtil";
 
 const ScrewPreviewModal = ({ id, onClose }) => {
   const [screw, setScrew] = useState(null);
@@ -11,11 +12,14 @@ const ScrewPreviewModal = ({ id, onClose }) => {
   const fetchScrew = async () => {
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_APP_API}api/v1/screw/${id}`
+        `${import.meta.env.VITE_APP_API}api/v1/screw/${id}`,
+        {headers:{
+          "Authorization" : `Bearer ${getToken()}`
+        }}
       );
       const data = await res.json();
-      console.log("Fetched screw data:", data); // Debug log
-      setScrew(data.result);
+      setScrew(data.result.screw);
+      if(data.result.isSaved) setFavorited(true)
     } catch (err) {
       console.error("Error fetching screw:", err);
     } finally {
@@ -69,8 +73,6 @@ const ScrewPreviewModal = ({ id, onClose }) => {
       </div>
     );
   }
-
-  console.log("Rendering screw:", screw); // Debug log
 
   return (
     <div className="modal-overlay">

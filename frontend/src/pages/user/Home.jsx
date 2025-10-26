@@ -19,8 +19,6 @@ function Home() {
     navigate("../save-analyses");
   }
 
-  function handlePreview(screwId) {}
-
   return (
     <div className="home-page">
       <Navbar searchKeyword={search} />

@@ -1,4 +1,5 @@
 const Screw = require("../models/screw");
+const SavedScrew = require("../models/saveScrew");
 const { uploadToCloudinary } = require("../utils/cloudinary");
 const apiFeatures = require("../utils/apiFeatures");
 
@@ -27,7 +28,20 @@ exports.getScrews = async (queryStr) => {
 exports.getSpecificScrew = async (request) => {
   if (!request.params) throw new Error("undefined parameter");
   const { screwId } = request.params;
-  const result = await Screw.findById(screwId).exec();
+  const screw = await Screw.findById(screwId).exec();
+
+  const getSave = await SavedScrew.find({ user: request.user.userId }).exec();
+  console.log(getSave[0].savedScrews);
+  let isSaved = false;
+
+  for (let item of getSave[0].savedScrews) {
+    console.log(item.screwId , screw._id)
+    if (screw._id.equals(item.screwId)) isSaved = true;
+  }
+
+  console.log(isSaved);
+  const result = { screw, isSaved };
+
   if (!result) throw new Error("screw does not exist on the database");
   return result;
 };
