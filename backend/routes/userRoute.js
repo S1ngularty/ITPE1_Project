@@ -28,6 +28,7 @@ router.post("/saved/:analysesRecordId",authMiddleware.verifyToken,userActivityCo
 router.post("/unsaved",authMiddleware.verifyToken,userActivityController.unsaveRecordAnalyses)
 
 router.post("/likes/add",authMiddleware.verifyToken,userActivityController.saveScrew)
+router.post("/likes/remove",authMiddleware.verifyToken,userActivityController.removeToLikes)
 
 
 

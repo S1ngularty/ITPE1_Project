@@ -104,6 +104,22 @@ const saveScrew = async (req, res) => {
   }
 };
 
+const removeToLikes = async (req, res) => {
+  try {
+    const result = await savedScrewService.removeToLikes(req);
+    return res.status(200).json({
+      success: true,
+      result,
+    });
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   saveActivity,
   fetchAnalysis,
@@ -111,4 +127,5 @@ module.exports = {
   editRecordAnalyses,
   unsaveRecordAnalyses,
   saveScrew,
+  removeToLikes
 };
