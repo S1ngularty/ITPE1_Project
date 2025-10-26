@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { X, Heart, ChevronLeft, ChevronRight } from "lucide-react";
 import "../../styles/user/pages/PreviewModal.css";
 import { getToken } from "../../utils/authUtil";
@@ -8,6 +9,7 @@ const ScrewPreviewModal = ({ id, onClose }) => {
   const [loading, setLoading] = useState(true);
   const [currentImg, setCurrentImg] = useState(0);
   const [favorited, setFavorited] = useState(false);
+  const navigate = useNavigate();
 
   const fetchScrew = async () => {
     try {
@@ -24,7 +26,7 @@ const ScrewPreviewModal = ({ id, onClose }) => {
         isAuthenticated
       );
       const data = await res.json();
-      console.log(data.result)
+      console.log(data.result);
       setScrew(data.result.screw);
       if (data.result.isSaved) setFavorited(true);
     } catch (err) {
@@ -53,6 +55,7 @@ const ScrewPreviewModal = ({ id, onClose }) => {
   };
 
   const toggleFavorite = async () => {
+    if (!getToken()) return navigate("/login");
     if (favorited) {
       try {
         const res = await fetch(
