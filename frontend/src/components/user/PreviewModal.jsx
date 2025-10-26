@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { X, Heart, ChevronLeft, ChevronRight } from "lucide-react";
-import "../styles/pages/PreviewModal.css";
+import "../../styles/user/pages/PreviewModal.css";
+import { getToken } from "../../utils/authUtil";
 
 const ScrewPreviewModal = ({ id, onClose }) => {
   const [screw, setScrew] = useState(null);
@@ -11,11 +12,16 @@ const ScrewPreviewModal = ({ id, onClose }) => {
   const fetchScrew = async () => {
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_APP_API}api/v1/screw/${id}`
+        `${import.meta.env.VITE_APP_API}api/v1/screw/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
       );
       const data = await res.json();
-      console.log("Fetched screw data:", data); // Debug log
-      setScrew(data.result);
+      setScrew(data.result.screw);
+      if (data.result.isSaved) setFavorited(true);
     } catch (err) {
       console.error("Error fetching screw:", err);
     } finally {
@@ -41,8 +47,56 @@ const ScrewPreviewModal = ({ id, onClose }) => {
     }
   };
 
-  const toggleFavorite = () => {
-    setFavorited((prev) => !prev);
+  const toggleFavorite = async () => {
+    if (favorited) {
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_APP_API}api/v1/likes/remove`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${getToken()}`,
+            },
+            body: JSON.stringify({ screwId: screw._id }),
+          }
+        );
+
+        if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+
+        const data = await res.json();
+
+        if (data) {
+          setFavorited(false);
+        }
+      } catch (err) {
+        console.error("Error unsaving the screw:", err);
+      }
+    } else {
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_APP_API}api/v1/likes/add`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${getToken()}`,
+            },
+            body: JSON.stringify({ screwId: screw._id }),
+          }
+        );
+
+        if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+
+        const data = await res.json();
+
+        if (data) {
+          setFavorited(true);
+        }
+      } catch (err) {
+        console.error("Error saving the screw:", err);
+      }
+    }
   };
 
   // Fallback content if data is missing
@@ -69,8 +123,6 @@ const ScrewPreviewModal = ({ id, onClose }) => {
       </div>
     );
   }
-
-  console.log("Rendering screw:", screw); // Debug log
 
   return (
     <div className="modal-overlay">

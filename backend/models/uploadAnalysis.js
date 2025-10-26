@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const userActivitySchema = new mongoose.Schema(
+const UploadAnalysisSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -40,4 +40,4 @@ const userActivitySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("UserActivity", userActivitySchema);
+module.exports = mongoose.model("UploadAnalysis", UploadAnalysisSchema);

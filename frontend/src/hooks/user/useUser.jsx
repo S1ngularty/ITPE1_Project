@@ -1,4 +1,4 @@
-import * as userService from "../services/userService";
+import * as userService from "../services/user/userService";
 import { useEffect, useState } from "react";
 
 function useUser() {

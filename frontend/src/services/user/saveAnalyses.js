@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getToken } from "../utils/authUtil";
+import { getToken } from "../../utils/authUtil";
 const recordRename = async (name, id) => {
   try {
     const result = axios.post(
@@ -9,7 +9,7 @@ const recordRename = async (name, id) => {
         headers: { Authorization: `Bearer ${getToken()}` },
       }
     );
-    if(result instanceof Error) throw new Error("something went wrong")
+    if (result instanceof Error) throw new Error("something went wrong");
     return result;
   } catch (error) {
     console.log(error);

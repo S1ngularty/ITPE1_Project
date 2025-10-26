@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import notify from "../../components/Toast";
+import notify from "../../components/user/Toast";
 
 function Login() {
   const [credentials, setCredentials] = useState({ email: "", password: "" });

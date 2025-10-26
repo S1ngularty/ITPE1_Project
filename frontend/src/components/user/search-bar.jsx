@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { getToken } from "../utils/authUtil";
+import { getToken } from "../../utils/authUtil";
 
 function SearchBar({ keyword }) {
   const [dataToSearch, setDataToSearch] = useState("");
@@ -33,7 +33,7 @@ function SearchBar({ keyword }) {
   }, [dataToSearch]);
 
   useEffect(() => {
-    if(!keyword) return
+    if (!keyword) return;
     keyword(results.result);
   }, [results]);
   return (

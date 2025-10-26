@@ -27,6 +27,9 @@ router.get("/getDashboard",authMiddleware.verifyToken, userActivityController.ge
 router.post("/saved/:analysesRecordId",authMiddleware.verifyToken,userActivityController.editRecordAnalyses)
 router.post("/unsaved",authMiddleware.verifyToken,userActivityController.unsaveRecordAnalyses)
 
+router.post("/likes/add",authMiddleware.verifyToken,userActivityController.saveScrew)
+router.post("/likes/remove",authMiddleware.verifyToken,userActivityController.removeToLikes)
+
 
 
 module.exports = router;

@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
-import "../styles/pages/Dashboard.css";
-import Navbar from "../components/layouts/Navbar";
-import {getToken} from "../utils/authUtil"
+import "../../styles/user/pages/Dashboard.css";
+import Navbar from "../../components/user/layouts/Navbar";
+import { getToken } from "../../utils/authUtil";
 import { useNavigate } from "react-router-dom";
 const Dashboard = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigate= useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchDashboardData();
@@ -16,20 +16,23 @@ const Dashboard = () => {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${import.meta.env.VITE_APP_API}api/v1/getDashboard`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${getToken()}`
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_APP_API}api/v1/getDashboard`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to fetch dashboard data");
       }
 
       const data = await response.json();
-      
+
       if (data.success) {
         setUserData(transformApiData(data.result));
       } else {
@@ -43,12 +46,10 @@ const Dashboard = () => {
     }
   };
 
-
-
   const transformApiData = (result) => {
     const { activity, requestUsage } = result;
     const allActivities = [...activity.isSave, ...activity.notSave];
-    
+
     // Sort by createdAt date (most recent first)
     const sortedActivities = allActivities.sort(
       (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
@@ -91,7 +92,9 @@ const Dashboard = () => {
     // Transform saved items
     const savedItems = activity.isSave.slice(0, 3).map((item) => ({
       id: item._id,
-      name: `${item.typeOfService.charAt(0).toUpperCase() + item.typeOfService.slice(1)} Analysis`,
+      name: `${
+        item.typeOfService.charAt(0).toUpperCase() + item.typeOfService.slice(1)
+      } Analysis`,
       screwType: item.screw ? "Classification" : "Count Detection",
       confidence: "N/A",
       date: item.createdAt.split("T")[0],
@@ -121,11 +124,11 @@ const Dashboard = () => {
     };
   };
 
-  const daysRemainingBeforeReset=()=>{
-    const date = new Date
-    return Math.abs(date.getDate()-30)
-  }
-  daysRemainingBeforeReset()
+  const daysRemainingBeforeReset = () => {
+    const date = new Date();
+    return Math.abs(date.getDate() - 30);
+  };
+  daysRemainingBeforeReset();
 
   const getTimeAgo = (timestamp) => {
     const now = new Date();
@@ -133,9 +136,12 @@ const Dashboard = () => {
     const diffInSeconds = Math.floor((now - past) / 1000);
 
     if (diffInSeconds < 60) return "Just now";
-    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
-    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
-    if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} days ago`;
+    if (diffInSeconds < 3600)
+      return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+    if (diffInSeconds < 86400)
+      return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+    if (diffInSeconds < 604800)
+      return `${Math.floor(diffInSeconds / 86400)} days ago`;
     return past.toLocaleDateString();
   };
 
@@ -238,7 +244,9 @@ const Dashboard = () => {
                   </div>
                   <div className="usage-stat">
                     <span className="usage-label">Resets in</span>
-                    <span className="usage-value">{daysRemainingBeforeReset()}</span>
+                    <span className="usage-value">
+                      {daysRemainingBeforeReset()}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -292,10 +300,15 @@ const Dashboard = () => {
                   userData.recentAnalyses.map((analysis) => (
                     <div key={analysis.id} className="analysis-card">
                       <div className="analysis-thumbnail">
-                        <img 
-                          src={analysis.thumbnail} 
+                        <img
+                          src={analysis.thumbnail}
                           alt={analysis.title}
-                          style={{ width: '80px', height: '60px', objectFit: 'cover', borderRadius: '4px' }}
+                          style={{
+                            width: "80px",
+                            height: "60px",
+                            objectFit: "cover",
+                            borderRadius: "4px",
+                          }}
                         />
                       </div>
                       <div className="analysis-content">
@@ -308,7 +321,9 @@ const Dashboard = () => {
                             {new Date(analysis.date).toLocaleDateString()}
                           </span>
                         </div>
-                        <button className="view-details-btn">View Details</button>
+                        <button className="view-details-btn">
+                          View Details
+                        </button>
                       </div>
                     </div>
                   ))
@@ -322,7 +337,11 @@ const Dashboard = () => {
             <div className="dashboard-card">
               <div className="card-header">
                 <h2 className="card-title">Saved Items</h2>
-                <button className="view-all-btn" onClick={()=>navigate("/save-analyses")}>View All →</button>
+                <button
+                  className="view-all-btn"
+                  onClick={() => navigate("/save-analyses")}>
+                  View All →
+                </button>
               </div>
               <div className="saved-items-list">
                 {userData.savedItems.length > 0 ? (
