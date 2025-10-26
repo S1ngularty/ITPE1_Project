@@ -3,8 +3,10 @@ const {
   dashboardInfo,
   fetchSaveAnalysis,
   editSaveAnalyses,
-  unsavedAnalyses
+  unsavedAnalyses,
 } = require("../services/uploadAnalysis");
+
+const savedScrewService = require("../services/savedScrews");
 
 const saveActivity = async (req, res) => {
   try {
@@ -24,7 +26,7 @@ const saveActivity = async (req, res) => {
 
 const fetchAnalysis = async (req, res) => {
   try {
-    const result = await fetchSaveAnalysis();
+    const result = await fetchSaveAnalysis(req);
     return res.status(200).json({
       success: true,
       result,
@@ -86,10 +88,27 @@ const unsaveRecordAnalyses = async (req, res) => {
   }
 };
 
+const saveScrew = async (req, res) => {
+  try {
+    const result = await savedScrewService.saveScrew(req);
+    return res.status(200).json({
+      success: true,
+      result,
+    });
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   saveActivity,
   fetchAnalysis,
   getDashboardInfo,
   editRecordAnalyses,
-  unsaveRecordAnalyses
+  unsaveRecordAnalyses,
+  saveScrew,
 };

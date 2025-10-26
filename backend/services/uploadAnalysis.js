@@ -3,7 +3,7 @@ const { uploadToCloudinary, singleImage } = require("../utils/cloudinary");
 
 const recentUploads = async (request) => {
   if (!request) throw new Error("no request found");
-  const result = await UserActivity.create(request.body);
+  const result = await UploadAnalysis.create(request.body);
   if (!result) throw new Error("failed to save as recents");
 };
 
@@ -23,8 +23,12 @@ const saveUploads = async (request) => {
   return updateActivity;
 };
 
-const fetchSaveAnalysis = async () => {
-  const savedAnalysis = await UploadAnalysis.find({ saveStatus: true })
+const fetchSaveAnalysis = async (request) => {
+  const { userId } = request.user;
+  const savedAnalysis = await UploadAnalysis.find({
+    saveStatus: true,
+    user: userId,
+  })
     .populate("user screw")
     .exec();
   if (savedAnalysis.length < 1) throw new Error("No saved analysis yet");
