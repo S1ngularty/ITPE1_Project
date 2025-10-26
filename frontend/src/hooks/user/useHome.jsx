@@ -5,8 +5,8 @@ import { getToken } from "../../utils/authUtil";
 
 function useHome() {
   const [screws, setScrews] = useState([]);
-  const [name, setName] = useState("");
-  const [selectedScrew, setSelectedScrew] =useState("")
+  const [name, setName] = useState("Guest");
+  const [selectedScrew, setSelectedScrew] = useState("");
   const [error, setError] = useState("");
 
   function search(data) {
@@ -22,17 +22,18 @@ function useHome() {
         },
       })
       .then((response) => {
-        console.log(response.data);
-        setName(response.data.result.name.split(" ")[0]);
+        // console.log(response.data);
+        const data = response.data.result.name.split(" ")[0] || "Guest";
+        setName(data);
       })
       .catch((error) => console.log(error));
   }
 
   useEffect(() => {
-    fetchUserName();
+    if (getToken()) fetchUserName();
   }, []);
 
-  return { screws, name, error, search,selectedScrew,setSelectedScrew};
+  return { screws, name, error, search, selectedScrew, setSelectedScrew };
 }
 
 export default useHome;

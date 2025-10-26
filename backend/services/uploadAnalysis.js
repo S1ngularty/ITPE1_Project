@@ -39,8 +39,8 @@ const dashboardInfo = async (user) => {
   if (!user) throw new Error("user is undefined");
 
   const [history, requestUsage] = await Promise.all([
-    UserActivity.find({ user: user.userId }).exec(),
-    UserActivity.find({ user: user.userId }).countDocuments().exec(),
+    UploadAnalysis.find({ user: user.userId }).exec(),
+    UploadAnalysis.find({ user: user.userId }).countDocuments().exec(),
   ]);
 
   // console.log(history, requestUsage);

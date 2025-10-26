@@ -1,12 +1,16 @@
 import React from "react";
 import { useState, useEffect } from "react";
+import { getToken } from "../../utils/authUtil";
 
 const useNavbar = () => {
   let [isLogin, setIsLogin] = useState(false);
 
   useEffect(() => {
-    setIsLogin(true);
+    if (getToken()) setIsLogin(true);
+    return
   }, []);
+
+  return { isLogin };
 };
 
-export default useNavbar
+export default useNavbar;
