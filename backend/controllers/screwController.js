@@ -41,7 +41,7 @@ exports.getScrewById = async (req, res) => {
 
 exports.GetFilterOptions = async (req, res) => {
   try {
-    const result = await screwService.getOptions();
+    const result = await screwService.getOptions(req);
     return res.status(200).json({
       success: true,
       result,

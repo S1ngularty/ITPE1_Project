@@ -11,13 +11,9 @@ function SearchBar({ keyword }) {
   }
 
   async function fetchScrews() {
-    axios(
+    console.log("fetching from search")
+    axios.get(
       `${import.meta.env.VITE_APP_API}api/v1/screw?keyword=${dataToSearch}`,
-      {
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-        },
-      }
     )
       .then((response) => {
         // console.log(response.data);

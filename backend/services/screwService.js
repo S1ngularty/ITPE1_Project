@@ -21,8 +21,13 @@ exports.createScrew = async (body, files) => {
 };
 
 exports.getScrews = async (queryStr) => {
+  // console.log(queryStr)
   const queryObject = new apiFeatures(Screw, queryStr);
-  await queryObject.search();
+  if (queryStr.keyword) {
+    await queryObject.search();
+  } else {
+    await queryObject.filter();
+  }
   return queryObject.query;
 };
 exports.getSpecificScrew = async (request) => {
@@ -47,8 +52,17 @@ exports.getSpecificScrew = async (request) => {
   return result;
 };
 
-exports.getOptions = async () => {
-  const screwOptions = await Screw.find({})
+exports.getOptions = async (request) => {
+  // console.log(request.query)
+  let query = request.query;
+  let condition = {};
+  if (query.category) condition.category = query.category;
+  if (query.material) condition.material = query.material;
+  if (query.driverType) condition.driverType = query.driverType;
+  if (query.threadedType) condition.threadedType = query.threadedType;
+  console.log(condition);
+
+  const screwOptions = await Screw.find(condition)
     .select("category material threadedType driverType -_id")
     .exec();
   if (!screwOptions) throw new Error("failed to get the data options");

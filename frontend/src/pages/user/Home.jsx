@@ -6,11 +6,9 @@ import ModalPreview from "../../components/user/PreviewModal";
 import useHome from "../../hooks/user/useHome";
 
 function Home() {
-  const { screws, name, error, search, selectedScrew, setSelectedScrew } =
+  const { screws, name, error, search, selectedScrew, setSelectedScrew,cbFilter } =
     useHome();
-
   const navigate = useNavigate();
-
   function handleUpload() {
     navigate("../upload-page");
   }
@@ -21,7 +19,7 @@ function Home() {
 
   return (
     <div className="home-page">
-      <Navbar searchKeyword={search} />
+      <Navbar searchKeyword={search} applyResult={cbFilter}/>
       {selectedScrew && (
         <ModalPreview
           id={selectedScrew}
