@@ -53,16 +53,7 @@ exports.getSpecificScrew = async (request) => {
 };
 
 exports.getOptions = async (request) => {
-  // console.log(request.query)
-  let query = request.query;
-  let condition = {};
-  if (query.category) condition.category = query.category;
-  if (query.material) condition.material = query.material;
-  if (query.driverType) condition.driverType = query.driverType;
-  if (query.threadedType) condition.threadedType = query.threadedType;
-  console.log(condition);
-
-  const screwOptions = await Screw.find(condition)
+  const screwOptions = await Screw.find()
     .select("category material threadedType driverType -_id")
     .exec();
   if (!screwOptions) throw new Error("failed to get the data options");

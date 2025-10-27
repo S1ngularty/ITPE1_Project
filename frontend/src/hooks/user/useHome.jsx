@@ -39,7 +39,7 @@ function useHome() {
   }, []);
 
   useEffect(() => {
-    console.log("confirmation",screws);
+    // console.log("confirmation",screws);
   }, [screws]);
 
   return {
