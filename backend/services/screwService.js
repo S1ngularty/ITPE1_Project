@@ -34,7 +34,7 @@ exports.getSpecificScrew = async (request) => {
   if (!screw) throw new Error("screw does not exist on the database");
 
   let getSave = null;
-  if (request.user!== null) {
+  if (request.user !== null) {
     getSave = await SavedScrew.find({ user: request.user.userId }).exec();
 
     for (let item of getSave[0].savedScrews) {
@@ -45,4 +45,30 @@ exports.getSpecificScrew = async (request) => {
   const result = { screw, isSaved };
 
   return result;
+};
+
+exports.getOptions = async () => {
+  const screwOptions = await Screw.find({})
+    .select("category material threadedType driverType -_id")
+    .exec();
+  if (!screwOptions) throw new Error("failed to get the data options");
+
+  let material = new Set(),
+    category = new Set(),
+    threadedType = new Set(),
+    driverType = new Set();
+
+  for (let obj of screwOptions) {
+    if (obj.material) material.add(obj.material);
+    if (obj.category) category.add(obj.category);
+    if (obj.threadedType) threadedType.add(obj.threadedType);
+    if (obj.driverType) driverType.add(obj.driverType);
+  }
+
+  return {
+    material: [...material],
+    category: [...category],
+    threadedType: [...threadedType],
+    driverType: [...driverType],
+  };
 };

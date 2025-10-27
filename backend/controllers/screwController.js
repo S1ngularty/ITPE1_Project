@@ -13,8 +13,8 @@ exports.create = async (req, res) => {
   }
 };
 
-exports.fetchScrews= async(req,res)=>{
- try {
+exports.fetchScrews = async (req, res) => {
+  try {
     const result = await screwService.getScrews(req.query);
     return res.status(200).json({ success: true, result });
   } catch (error) {
@@ -24,10 +24,10 @@ exports.fetchScrews= async(req,res)=>{
       error: error.message,
     });
   }
-}
+};
 
-exports.getScrewById= async(req,res)=>{
- try {
+exports.getScrewById = async (req, res) => {
+  try {
     const result = await screwService.getSpecificScrew(req);
     return res.status(200).json({ success: true, result });
   } catch (error) {
@@ -37,5 +37,20 @@ exports.getScrewById= async(req,res)=>{
       error: error.message,
     });
   }
-}
+};
 
+exports.GetFilterOptions = async (req, res) => {
+  try {
+    const result = await screwService.getOptions();
+    return res.status(200).json({
+      success: true,
+      result,
+    });
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+};
