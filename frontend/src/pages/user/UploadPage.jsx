@@ -307,7 +307,7 @@ function UploadPage() {
       } else if (mode === "count") {
         setResults({
           type: "Screw Count",
-          count: `${data.predictions?.length || 0} screws detected`,
+          count: `${data.predictions || 0} screws detected`,
         });
       }
     } catch (err) {

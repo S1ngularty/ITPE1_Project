@@ -6,17 +6,15 @@ const ml_count = async (req, res) => {
     // console.log(result.response.data,result.storeRecent)
     return res.status(200).json({
       success: true,
-      predictions: result.response.data.predictions || [],
-      storeRecent: result.storeRecent
+      // predictions: result.response.data.predictions || [],
+      predictions: result.objectCount,
+      storeRecent: result.storeRecent,
     });
   } catch (error) {
-    console.error(
-      "Error:",error.message
-    );
+    console.error("Error:", error.message);
     res.status(500).json({
       success: false,
-      error:error.message,
-      
+      error: error.message,
     });
   }
 };
@@ -25,7 +23,13 @@ const ml_classify = async (req, res) => {
   try {
     const result = await mlService.classify(req);
     // console.log(result)
-    return res.status(200).json({ success: true, result:result.screwDocument, storeRecent:result.storeRecent });
+    return res
+      .status(200)
+      .json({
+        success: true,
+        result: result.screwDocument,
+        storeRecent: result.storeRecent,
+      });
   } catch (error) {
     // console.log(error.message);
     return res.status(500).json({ success: false, error: error.message });
