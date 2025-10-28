@@ -38,3 +38,9 @@ exports.removeToLikes = async (request) => {
   toRemove[0].save();
   return toRemove;
 };
+
+exports.LikedScrews = async(request)=>{
+  let {userId} = request.user
+  const savedScrews = await SaveScrew.find({user:userId}).populate("savedScrews.screwId")
+  return savedScrews
+}

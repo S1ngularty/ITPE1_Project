@@ -29,6 +29,7 @@ router.post("/unsaved",authMiddleware.verifyToken,userActivityController.unsaveR
 
 router.post("/likes/add",authMiddleware.verifyToken,userActivityController.saveScrew)
 router.post("/likes/remove",authMiddleware.checkForAuth,userActivityController.removeToLikes)
+router.get("/likes",authMiddleware.verifyToken,userActivityController.getLikedScrews)
 
 
 

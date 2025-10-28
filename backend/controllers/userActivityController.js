@@ -120,12 +120,29 @@ const removeToLikes = async (req, res) => {
   }
 };
 
+const getLikedScrews = async (req, res) => {
+  try {
+    const result = await savedScrewService.LikedScrews(req);
+    return res.status(200).json({
+      success: true,
+      result,
+    });
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
+  getLikedScrews,
   saveActivity,
   fetchAnalysis,
   getDashboardInfo,
   editRecordAnalyses,
   unsaveRecordAnalyses,
   saveScrew,
-  removeToLikes
+  removeToLikes,
 };
