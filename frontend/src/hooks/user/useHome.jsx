@@ -10,7 +10,12 @@ function useHome() {
   const [error, setError] = useState("");
 
   function search(data) {
-    // console.log("from home:", data);
+    // console.log("from search:", data);
+    setScrews(data);
+  }
+
+  function cbFilter(data) {
+    // console.log("from filter:", data);
     setScrews(data);
   }
 
@@ -33,7 +38,19 @@ function useHome() {
     if (getToken()) fetchUserName();
   }, []);
 
-  return { screws, name, error, search, selectedScrew, setSelectedScrew };
+  useEffect(() => {
+    // console.log("confirmation",screws);
+  }, [screws]);
+
+  return {
+    screws,
+    name,
+    error,
+    search,
+    selectedScrew,
+    setSelectedScrew,
+    cbFilter,
+  };
 }
 
 export default useHome;

@@ -7,8 +7,8 @@ import ConfirmationModal from "../ConfirmationModal";
 import FilterContainer from "../FilterContainer";
 import { Filter } from "lucide-react";
 
-function Navbar({ searchKeyword }) {
-  const { isLogin, setShowModal, showModal } = useNavbar();
+function Navbar({ searchKeyword, applyResult }) {
+  const { isLogin, setShowModal, showModal, filterData } = useNavbar();
   const [showFilter, setShowFilter] = useState(false);
   const navigate = useNavigate();
 
@@ -42,11 +42,12 @@ function Navbar({ searchKeyword }) {
         />
         <button
           className="filter-button"
-          onClick={() => setShowFilter((prev) => !prev)}
-        >
+          onClick={() => setShowFilter((prev) => !prev)}>
           <Filter size={20} />
         </button>
-        {showFilter && <FilterContainer />}
+        {showFilter && (
+          <FilterContainer data={filterData} applyResult={applyResult} />
+        )}
       </div>
 
       {isLogin && (
@@ -68,8 +69,7 @@ function Navbar({ searchKeyword }) {
 
       <button
         className="navbar-button"
-        onClick={isLogin ? () => setShowModal(true) : handleLogin}
-      >
+        onClick={isLogin ? () => setShowModal(true) : handleLogin}>
         {isLogin ? "Logout" : "Sign in"}
       </button>
     </nav>

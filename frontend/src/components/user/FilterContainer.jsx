@@ -1,25 +1,36 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../../styles/user/components/filter-container.css";
+import axios from "axios";
 
-function FilterContainer() {
+function FilterContainer({ data, applyResult}) {
+  const [filterData, setFilterData] = useState(data);
   const [filters, setFilters] = useState({
     category: "",
     material: "",
     driverType: "",
     threadedType: "",
-    strength: "",
   });
-
-  const categories = ["Wood Screw", "Machine Screw", "Structural Fastener", "Anchor Screw"];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
+  // useEffect(() => console.log(filters), [filters]);
+
   const handleApply = () => {
-    console.log("Applied filters:", filters);
-    // TODO: emit filters via props or context for API/filtering logic
+        // console.log("fetching from filter")
+    const query = `?category=${filters.category}&material=${filters.material}&driverType=${filters.driverType}&threadedType=${filters.threadedType}`;
+    axios(
+      `${import.meta.env.VITE_APP_API}api/v1/screw${query}`,
+    )
+      .then((response) => {
+        // console.log(response.data);
+        applyResult(response.data.result);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const handleReset = () => {
@@ -38,9 +49,12 @@ function FilterContainer() {
 
       <label>
         Category:
-        <select name="category" value={filters.category} onChange={handleChange}>
+        <select
+          name="category"
+          value={filters.category}
+          onChange={handleChange}>
           <option value="">All</option>
-          {categories.map((cat) => (
+          {filterData.category.map((cat) => (
             <option key={cat}>{cat}</option>
           ))}
         </select>
@@ -48,46 +62,41 @@ function FilterContainer() {
 
       <label>
         Material:
-        <input
-          type="text"
+        <select
           name="material"
           value={filters.material}
-          onChange={handleChange}
-          placeholder="e.g. Steel"
-        />
+          onChange={handleChange}>
+          <option value="">All</option>
+          {filterData.material.map((cat) => (
+            <option key={cat}>{cat}</option>
+          ))}
+        </select>
       </label>
 
       <label>
         Driver Type:
-        <input
-          type="text"
+        <select
           name="driverType"
           value={filters.driverType}
-          onChange={handleChange}
-          placeholder="e.g. Phillips"
-        />
+          onChange={handleChange}>
+          <option value="">All</option>
+          {filterData.driverType.map((cat) => (
+            <option key={cat}>{cat}</option>
+          ))}
+        </select>
       </label>
 
       <label>
         Threaded Type:
-        <input
-          type="text"
+        <select
           name="threadedType"
           value={filters.threadedType}
-          onChange={handleChange}
-          placeholder="e.g. Fully Threaded"
-        />
-      </label>
-
-      <label>
-        Strength:
-        <input
-          type="text"
-          name="strength"
-          value={filters.strength}
-          onChange={handleChange}
-          placeholder="e.g. High Tensile"
-        />
+          onChange={handleChange}>
+          <option value="">All</option>
+          {filterData.threadedType.map((cat) => (
+            <option key={cat}>{cat}</option>
+          ))}
+        </select>
       </label>
 
       <div className="filter-actions">
