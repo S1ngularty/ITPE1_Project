@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../../styles/user/pages/UploadPage.css";
@@ -18,27 +18,262 @@ function UploadPage() {
   const [loadingSave, setLoadingSave] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [saveData, setSaveData] = useState("");
+  const [cameraActive, setCameraActive] = useState(false);
+  const [uploadMethod, setUploadMethod] = useState("file");
+  const [cameraError, setCameraError] = useState("");
+  const [cameraLoading, setCameraLoading] = useState(false);
+  
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
+  const canvasRef = useRef(null);
 
-  // useEffect(()=>{
-  //   console.log(saveData)
-  // },[saveData])
-  //   useEffect(()=>{
-  //   console.log(results)
-  // },[results])
-  // Dummy history (static for now, later can come from DB)
   const history = [
     { id: 1, name: "screw_01.png" },
     { id: 2, name: "hole_02.jpg" },
     { id: 3, name: "part_03.png" },
   ];
 
+  // Clean up camera on unmount
+  useEffect(() => {
+    return () => {
+      if (streamRef.current) {
+        stopCamera();
+      }
+    };
+  }, []);
+
+  // Start camera automatically when uploadMethod changes to 'camera'
+  useEffect(() => {
+    if (uploadMethod === 'camera' && !cameraActive && !cameraLoading) {
+      startCamera();
+    }
+  }, [uploadMethod, cameraActive, cameraLoading]);
+
+  const startCamera = async () => {
+    console.log("🎥 [START] Starting camera...");
+    
+    try {
+      setCameraError("");
+      setCameraLoading(true);
+      
+      // Stop any existing stream first
+      if (streamRef.current) {
+        console.log("⚠️ Stopping existing stream");
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+      
+      const constraints = {
+        video: {
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        },
+        audio: false
+      };
+      console.log("📋 Camera constraints:", constraints);
+      
+      console.log("🔍 Requesting camera access...");
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      console.log("✓ Camera access granted! Stream:", stream);
+      
+      streamRef.current = stream;
+      console.log("✓ Stream saved to ref");
+      
+      // Wait for video element to be available in DOM
+      let videoElement = videoRef.current;
+      if (!videoElement) {
+        console.log("⏳ Waiting for video element to be available...");
+        // Wait for React to render the video element
+        await new Promise(resolve => setTimeout(resolve, 100));
+        videoElement = videoRef.current;
+      }
+      
+      if (!videoElement) {
+        throw new Error("Video element not found in DOM");
+      }
+      
+      console.log("✓ Video element found:", videoElement);
+      
+      videoElement.srcObject = stream;
+      console.log("✓ Stream assigned to video element");
+      
+      // Wait for video to be ready
+      await new Promise((resolve, reject) => {
+        videoElement.onloadedmetadata = () => {
+          console.log("✓ Video metadata loaded");
+          console.log("📐 Video dimensions:", {
+            width: videoElement.videoWidth,
+            height: videoElement.videoHeight
+          });
+          resolve();
+        };
+        
+        videoElement.onerror = (e) => {
+          console.error("❌ Video element error:", e);
+          reject(new Error("Video stream error"));
+        };
+        
+        // Timeout fallback
+        setTimeout(() => {
+          if (videoElement.readyState >= videoElement.HAVE_METADATA) {
+            resolve();
+          }
+        }, 3000);
+      });
+      
+      // Play the video
+      await videoElement.play();
+      console.log("✓ Video playing successfully!");
+      
+      setCameraActive(true);
+      setCameraLoading(false);
+      
+      // Reset file selection when switching to camera
+      setSelectedFile(null);
+      setPreview(null);
+      console.log("✓ File selection cleared");
+      
+      console.log("🎉 Camera started successfully!");
+      
+    } catch (err) {
+      console.error("❌ [ERROR] Camera startup failed:", err);
+      console.error("Error name:", err.name);
+      console.error("Error message:", err.message);
+      
+      let errorMessage = "Cannot access camera. ";
+      
+      if (err.name === 'NotAllowedError') {
+        errorMessage += "Please allow camera permissions.";
+      } else if (err.name === 'NotFoundError') {
+        errorMessage += "No camera found on this device.";
+      } else if (err.name === 'NotReadableError') {
+        errorMessage += "Camera is already in use by another application.";
+      } else {
+        errorMessage += "Please check permissions and try again.";
+      }
+      
+      setCameraError(errorMessage);
+      notify("error", errorMessage);
+      setUploadMethod("file");
+      setCameraActive(false);
+      setCameraLoading(false);
+    }
+  };
+
+  const stopCamera = () => {
+    console.log("🛑 Stopping camera...");
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => {
+        console.log(`Stopping track: ${track.kind}`);
+        track.stop();
+      });
+      streamRef.current = null;
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+    setCameraActive(false);
+    setCameraLoading(false);
+    setCameraError("");
+  };
+
+  const captureImage = () => {
+    console.log("📸 Capturing image...");
+
+    if (!videoRef.current || !canvasRef.current) {
+      notify("error", "Camera not ready. Please try again.");
+      return;
+    }
+
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    
+    // Check if video is actually playing and has data
+    if (video.readyState !== video.HAVE_ENOUGH_DATA) {
+      notify("error", "Video not ready. Please wait a moment and try again.");
+      return;
+    }
+    
+    const context = canvas.getContext('2d');
+
+    // Set canvas dimensions to match video
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    console.log("📐 Capture dimensions:", { width: canvas.width, height: canvas.height });
+
+    // Check for valid dimensions
+    if (canvas.width === 0 || canvas.height === 0) {
+      notify("error", "Invalid video dimensions. Please restart the camera.");
+      return;
+    }
+
+    // Draw current video frame to canvas
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    console.log("✓ Image drawn to canvas");
+
+    // Convert canvas to blob and create file
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        notify("error", "Failed to capture image. Please try again.");
+        return;
+      }
+      
+      console.log("✓ Blob created, size:", blob.size);
+      
+      const file = new File([blob], `capture-${Date.now()}.jpg`, { 
+        type: 'image/jpeg' 
+      });
+      
+      setSelectedFile(file);
+      setPreview(canvas.toDataURL('image/jpeg'));
+      
+      // Stop camera after capture
+      stopCamera();
+      setUploadMethod("file");
+      
+      notify("success", "Image captured successfully!");
+    }, 'image/jpeg', 0.95);
+  };
+
+  const cancelCamera = () => {
+    console.log("❌ Cancelling camera...");
+    stopCamera();
+    setUploadMethod("file");
+  };
+
+  // Rest of your functions remain the same...
   function handleFileChange(e) {
     const file = e.target.files[0];
     if (file) {
       setSelectedFile(file);
       setPreview(URL.createObjectURL(file));
+      setUploadMethod("file");
+      
+      // Stop camera if active
+      if (cameraActive) {
+        stopCamera();
+      }
     }
   }
+
+  // Handle drag and drop
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) {
+      setSelectedFile(file);
+      setPreview(URL.createObjectURL(file));
+      setUploadMethod("file");
+      
+      if (cameraActive) {
+        stopCamera();
+      }
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
 
   async function handleAnalyze() {
     if (!selectedFile) {
@@ -242,6 +477,10 @@ function UploadPage() {
           onSubmit={handleSave}
           alreadySaved={false}></NamingModal>
       )}
+      
+      {/* Hidden canvas for image capture */}
+      <canvas ref={canvasRef} style={{ display: 'none' }} />
+      
       {/* Main Content - Horizontal Layout */}
       <main className="upload-main-horizontal">
         {/* Left Section - Image Upload */}
@@ -249,29 +488,126 @@ function UploadPage() {
           <div className="section-card">
             <h2>Upload Image</h2>
 
-            {/* Upload area */}
-            <label className="upload-box">
-              <div className="upload-icon">
-                <svg
-                  width="48"
-                  height="48"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <polyline points="17 8 12 3 7 8" />
-                  <line x1="12" y1="3" x2="12" y2="15" />
-                </svg>
+            {/* Upload Method Selection */}
+            <div className="upload-method-selection">
+              <button
+                className={`method-btn ${uploadMethod === 'file' ? 'active' : ''}`}
+                onClick={() => {
+                  setUploadMethod('file');
+                  if (cameraActive) stopCamera();
+                }}
+              >
+                📁 File Upload
+              </button>
+              <button
+                className={`method-btn ${uploadMethod === 'camera' ? 'active' : ''}`}
+                onClick={() => setUploadMethod('camera')}
+                disabled={cameraLoading}
+              >
+                {cameraLoading ? "🔄 Starting..." : "📷 Use Camera"}
+              </button>
+            </div>
+
+            {/* Camera Error Display */}
+            {cameraError && (
+              <div className="camera-error-message">
+                <p>❌ {cameraError}</p>
               </div>
-              <span className="upload-text">Drag & drop your file here</span>
-              <span className="upload-subtext">or click to browse files</span>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                hidden
-              />
-            </label>
+            )}
+
+            {/* File Upload Area */}
+            {uploadMethod === 'file' && (
+              <label 
+                className="upload-box"
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+              >
+                <div className="upload-icon">
+                  <svg
+                    width="48"
+                    height="48"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="17 8 12 3 7 8" />
+                    <line x1="12" y1="3" x2="12" y2="15" />
+                  </svg>
+                </div>
+                <span className="upload-text">Drag & drop your file here</span>
+                <span className="upload-subtext">or click to browse files</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  hidden
+                />
+              </label>
+            )}
+
+            {/* Camera Capture Area - ALWAYS RENDER VIDEO ELEMENT WHEN IN CAMERA MODE */}
+            {uploadMethod === 'camera' && (
+              <div className="camera-section">
+                {/* Always render the video element, but control visibility */}
+                <div className="camera-preview" style={{ 
+                  display: cameraActive ? 'block' : 'none',
+                  position: 'relative'
+                }}>
+                  <video 
+                    ref={videoRef} 
+                    autoPlay 
+                    playsInline
+                    muted
+                    className="camera-video"
+                    style={{ 
+                      width: '100%', 
+                      height: 'auto',
+                      backgroundColor: '#000',
+                      display: 'block',
+                      borderRadius: '8px'
+                    }}
+                  />
+                  <div className="camera-status">
+                    Camera active - Point at screws and capture when ready
+                  </div>
+                </div>
+
+                {/* Show loading or placeholder when camera is not active */}
+                {!cameraActive && (
+                  <div className="camera-placeholder">
+                    {cameraLoading ? (
+                      <>
+                        <div className="camera-loading">🔄</div>
+                        <p>Starting camera...</p>
+                      </>
+                    ) : (
+                      <>
+                        <div className="camera-icon">📷</div>
+                        <p>Click "Use Camera" to start</p>
+                      </>
+                    )}
+                  </div>
+                )}
+
+                {/* Camera controls - only show when camera is active */}
+                {cameraActive && (
+                  <div className="camera-controls">
+                    <button 
+                      onClick={captureImage}
+                      className="capture-btn"
+                    >
+                      📸 Capture Image
+                    </button>
+                    <button 
+                      onClick={cancelCamera}
+                      className="cancel-btn"
+                    >
+                      ❌ Cancel
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Preview */}
             {preview && (
@@ -327,7 +663,6 @@ function UploadPage() {
             </button>
           </div>
         </section>
-
         {/* Center Section - Results */}
         <section className="results-section">
           <div className="section-card">

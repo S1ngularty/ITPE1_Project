@@ -30,7 +30,7 @@ const classify = async (request) => {
   );
 
   const toFetchDocument = screwData.data.predicted_classes[0];
-  // console.log("here ", toFetchDocument);
+  console.log("here ", toFetchDocument);
 
   const screwDocument = await Screw.find({
     name: toFetchDocument,

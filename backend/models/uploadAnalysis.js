@@ -4,8 +4,7 @@ const UploadAnalysisSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      default: `Analysis-${Date.now()}`,
-      unique:true
+      default: `Analysis-${Date.now()}-${new Date().getMilliseconds()}`,
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,
