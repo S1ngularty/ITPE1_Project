@@ -16,7 +16,9 @@ import SavedAnalyses from "./pages/user/SavedAnalysesPage.jsx";
 import Profile from "./pages/user/Profle";
 import RecoveryPassword from "./pages/auth/RecoveryPassword.jsx";
 import Dashboard from "./pages/user/Dashboard.jsx";
+import AdminDashboard from "./pages/admin/Dashboard.jsx";
 import "./index.css";
+import UserManagement from "./pages/admin/UserManagement.jsx";
 
 function App() {
   return (
@@ -65,6 +67,14 @@ function App() {
           <Route
             path="/recovery-password"
             element={<RecoveryPassword></RecoveryPassword>}></Route>
+
+          {/* Admin routes */}
+          <Route
+            path="/admin/dashboard"
+            element={<AdminDashboard></AdminDashboard>}></Route>
+          <Route
+            path="/admin/users"
+            element={<UserManagement></UserManagement>}></Route>
         </Routes>
       </Router>
     </>
