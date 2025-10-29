@@ -31,6 +31,9 @@ router.post("/likes/add",authMiddleware.verifyToken,userActivityController.saveS
 router.post("/likes/remove",authMiddleware.checkForAuth,userActivityController.removeToLikes)
 router.get("/likes",authMiddleware.verifyToken,userActivityController.getLikedScrews)
 
+router.post("/download-report",authMiddleware.verifyToken,userActivityController.downloadAnalysisPdf)
+
+
 
 
 module.exports = router;

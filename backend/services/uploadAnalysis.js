@@ -1,5 +1,8 @@
 const UploadAnalysis = require("../models/uploadAnalysis");
 const { uploadToCloudinary, singleImage } = require("../utils/cloudinary");
+const PDFDocument = require("pdfkit");
+const axios = require("axios");
+const fs = require("fs");
 
 const recentUploads = async (request) => {
   if (!request) throw new Error("no request found");
@@ -82,10 +85,295 @@ const unsavedAnalyses = async (request) => {
   return record;
 };
 
+const downloadAnalysis = async (request, download) => {
+    const { result, storeRecent, mode } = request.body;
+    console.log(request.body);
+    
+    const doc = new PDFDocument({ 
+        margin: 50,
+        size: 'A4',
+        info: {
+            Title: `Screw Analysis Report - ${storeRecent.name}`,
+            Author: 'ScrewIT System',
+            Subject: mode === 'classify' ? 'Screw Classification Analysis' : 'Screw Counting Analysis'
+        }
+    });
+    
+    const filename = `${storeRecent.name.replace(/\s+/g, '_')}_analysis_report.pdf`;
+    const filePath = `./uploads/reports/${filename}`;
+
+    // Create folder if not exists
+    if (!fs.existsSync("./uploads/reports")) {
+        fs.mkdirSync("./uploads/reports", { recursive: true });
+    }
+
+    // Colors
+    const primaryColor = '#2c3e50';
+    const secondaryColor = '#3498db';
+    const accentColor = '#e74c3c';
+    const lightGray = '#f8f9fa';
+    const borderColor = '#dee2e6';
+    const darkGray = '#7f8c8d';
+
+    // Pipe to file
+    const writeStream = fs.createWriteStream(filePath);
+    doc.pipe(writeStream);
+
+    // Header with background
+    doc
+        .rect(0, 0, doc.page.width, 100)
+        .fill(primaryColor);
+
+    doc
+        .fillColor('#ffffff')
+        .fontSize(22)
+        .font('Helvetica-Bold')
+        .text(mode === 'classify' ? "SCREW CLASSIFICATION REPORT" : "SCREW COUNTING REPORT", 50, 40, { align: "center" })
+        .fontSize(10)
+        .font('Helvetica')
+        .text(mode === 'classify' ? "Comprehensive Classification Analysis" : "Screw Counting Analysis", 50, 70, { align: "center" });
+
+    // Analysis info section
+    const sectionStartY = 130;
+    doc.y = sectionStartY;
+    
+    doc
+        .fillColor(primaryColor)
+        .fontSize(16)
+        .font('Helvetica-Bold')
+        .text("ANALYSIS INFORMATION", 50, doc.y)
+        .moveDown(0.3);
+
+    // Info box with background
+    const infoBoxY = doc.y;
+    doc
+        .rect(50, infoBoxY, doc.page.width - 100, 80)
+        .fill(lightGray)
+        .stroke(borderColor);
+
+    doc
+        .fillColor(primaryColor)
+        .fontSize(10)
+        .font('Helvetica-Bold')
+        .text("Analysis Name:", 60, infoBoxY + 15)
+        .text("Type of Service:", 60, infoBoxY + 35)
+        .text("Date:", 60, infoBoxY + 55)
+        .text("User ID:", 300, infoBoxY + 15);
+
+    doc
+        .fillColor(darkGray)
+        .font('Helvetica')
+        .text(storeRecent.name, 140, infoBoxY + 15)
+        .text(storeRecent.typeOfService, 140, infoBoxY + 35)
+        .text(new Date(storeRecent.createdAt).toLocaleString(), 140, infoBoxY + 55)
+        .text(storeRecent.user, 340, infoBoxY + 15);
+
+    doc.y = infoBoxY + 90;
+
+    // Image section
+    doc
+        .fillColor(primaryColor)
+        .fontSize(16)
+        .font('Helvetica-Bold')
+        .text("ANALYZED IMAGE", 50, doc.y)
+        .moveDown(0.3);
+
+    const imageUrl = storeRecent.uploadedImage?.url;
+    if (imageUrl) {
+        try {
+            // Download the image temporarily
+            const response = await axios.get(imageUrl, { responseType: "arraybuffer" });
+            const tempImg = `./uploads/temp-image-${Date.now()}.jpg`;
+            fs.writeFileSync(tempImg, Buffer.from(response.data));
+            
+            // Image with border
+            const imageY = doc.y;
+            doc
+                .rect(50, imageY, doc.page.width - 100, 200)
+                .stroke(borderColor);
+                
+            doc.image(tempImg, 55, imageY + 5, { 
+                fit: [doc.page.width - 110, 190],
+                align: "center" 
+            });
+            
+            fs.unlinkSync(tempImg);
+            doc.y = imageY + 210;
+        } catch (error) {
+            console.error('Error loading image:', error);
+            doc
+                .fillColor(accentColor)
+                .text('Image not available', 50, doc.y)
+                .moveDown(0.5);
+        }
+    }
+
+    // Conditional content based on mode
+    if (mode === 'classify') {
+        // CLASSIFICATION MODE CONTENT
+        doc
+            .fillColor(primaryColor)
+            .fontSize(16)
+            .font('Helvetica-Bold')
+            .text("SCREW DETAILS", 50, doc.y)
+            .moveDown(0.3);
+
+        // Details table
+        const detailsY = doc.y;
+        const detailsHeight = 120;
+        
+        doc
+            .rect(50, detailsY, doc.page.width - 100, detailsHeight)
+            .fill(lightGray)
+            .stroke(borderColor);
+
+        // Column 1
+        doc
+            .fillColor(primaryColor)
+            .fontSize(10)
+            .font('Helvetica-Bold')
+            .text("Name:", 60, detailsY + 15)
+            .text("Category:", 60, detailsY + 35)
+            .text("Material:", 60, detailsY + 55)
+            .text("Strength:", 60, detailsY + 75)
+            .text("Sizes:", 60, detailsY + 95);
+
+        doc
+            .fillColor(darkGray)
+            .font('Helvetica')
+            .text(result.name || 'N/A', 120, detailsY + 15)
+            .text(result.category || 'N/A', 120, detailsY + 35)
+            .text(result.material || 'N/A', 120, detailsY + 55)
+            .text(result.strength || 'N/A', 120, detailsY + 75)
+            .text(result.sizes?.join(", ") || 'N/A', 120, detailsY + 95, {
+                width: doc.page.width - 140
+            });
+
+        doc.y = detailsY + detailsHeight + 20;
+
+        // Description section
+        doc
+            .fillColor(primaryColor)
+            .fontSize(16)
+            .font('Helvetica-Bold')
+            .text("DESCRIPTION", 50, doc.y)
+            .moveDown(0.3);
+
+        // Description box
+        const descY = doc.y;
+        const descHeight = 120;
+        
+        doc
+            .rect(50, descY, doc.page.width - 100, descHeight)
+            .fill(lightGray)
+            .stroke(borderColor);
+
+        doc
+            .fillColor(darkGray)
+            .fontSize(10)
+            .font('Helvetica')
+            .text(result.description || 'No description available.', 60, descY + 15, {
+                width: doc.page.width - 120,
+                align: "justify"
+            });
+
+    } else if (mode === 'count') {
+        // COUNTING MODE CONTENT
+        doc
+            .fillColor(primaryColor)
+            .fontSize(16)
+            .font('Helvetica-Bold')
+            .text("COUNTING RESULTS", 50, doc.y)
+            .moveDown(0.3);
+
+        // Counting results box
+        const countY = doc.y;
+        const countHeight = 100;
+        
+        doc
+            .rect(50, countY, doc.page.width - 100, countHeight)
+            .fill(lightGray)
+            .stroke(borderColor);
+
+        // Main count result
+        doc
+            .fillColor(primaryColor)
+            .fontSize(24)
+            .font('Helvetica-Bold')
+            .text(result.count || '0 screws detected', 0, countY + 30, { 
+                align: 'center',
+                width: doc.page.width 
+            });
+
+        // Additional counting information
+        doc
+            .fillColor(darkGray)
+            .fontSize(12)
+            .font('Helvetica')
+            .text(`Analysis Type: ${result.type || 'Screw Counting'}`, 0, countY + 70, { 
+                align: 'center',
+                width: doc.page.width 
+            });
+
+        doc.y = countY + countHeight + 30;
+
+        // Counting summary section
+        doc
+            .fillColor(primaryColor)
+            .fontSize(16)
+            .font('Helvetica-Bold')
+            .text("ANALYSIS SUMMARY", 50, doc.y)
+            .moveDown(0.3);
+
+        const summaryY = doc.y;
+        const summaryHeight = 80;
+        
+        doc
+            .rect(50, summaryY, doc.page.width - 100, summaryHeight)
+            .fill(lightGray)
+            .stroke(borderColor);
+
+        doc
+            .fillColor(darkGray)
+            .fontSize(10)
+            .font('Helvetica')
+            .text("This analysis used computer vision to detect and count screws in the uploaded image. The system identified individual screw instances and provided the total count.", 60, summaryY + 15, {
+                width: doc.page.width - 120,
+                align: "justify"
+            })
+            .text(`Analysis completed on: ${new Date(storeRecent.createdAt).toLocaleString()}`, 60, summaryY + 50, {
+                width: doc.page.width - 120
+            });
+    }
+
+    // Footer
+    const footerY = doc.page.height - 50;
+    doc
+        .fillColor(primaryColor)
+        .fontSize(8)
+        .text("Generated by ScrewIT System (Local School Project)", 50, footerY, {
+            align: "center"
+        })
+        .text(`Page 1 of 1 • Generated on ${new Date().toLocaleString()}`, 50, footerY + 15, {
+            align: "center"
+        });
+
+    doc.end();
+
+    writeStream.on("finish", () => {
+        download(filePath, filename);
+    });
+
+    writeStream.on("error", (error) => {
+        console.error('Error generating PDF:', error);
+    });
+};
+
 module.exports = {
   saveUploads,
   fetchSaveAnalysis,
   dashboardInfo,
   editSaveAnalyses,
   unsavedAnalyses,
+  downloadAnalysis
 };

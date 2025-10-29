@@ -14,6 +14,7 @@ function UploadPage() {
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState(null);
+  const [storedData,setStoredData] = useState({})
   const [mode, setMode] = useState("classify");
   const [loadingSave, setLoadingSave] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -22,7 +23,7 @@ function UploadPage() {
   const [uploadMethod, setUploadMethod] = useState("file");
   const [cameraError, setCameraError] = useState("");
   const [cameraLoading, setCameraLoading] = useState(false);
-  
+
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const canvasRef = useRef(null);
@@ -44,74 +45,63 @@ function UploadPage() {
 
   // Start camera automatically when uploadMethod changes to 'camera'
   useEffect(() => {
-    if (uploadMethod === 'camera' && !cameraActive && !cameraLoading) {
+    if (uploadMethod === "camera" && !cameraActive && !cameraLoading) {
       startCamera();
     }
   }, [uploadMethod, cameraActive, cameraLoading]);
 
   const startCamera = async () => {
-    console.log("🎥 [START] Starting camera...");
-    
+
     try {
       setCameraError("");
       setCameraLoading(true);
-      
+
       // Stop any existing stream first
       if (streamRef.current) {
-        console.log("⚠️ Stopping existing stream");
-        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current.getTracks().forEach((track) => track.stop());
       }
-      
+
       const constraints = {
         video: {
           width: { ideal: 1280 },
-          height: { ideal: 720 }
+          height: { ideal: 720 },
         },
-        audio: false
+        audio: false,
       };
-      console.log("📋 Camera constraints:", constraints);
-      
-      console.log("🔍 Requesting camera access...");
+
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
-      console.log("✓ Camera access granted! Stream:", stream);
-      
+
       streamRef.current = stream;
-      console.log("✓ Stream saved to ref");
-      
+
       // Wait for video element to be available in DOM
       let videoElement = videoRef.current;
       if (!videoElement) {
-        console.log("⏳ Waiting for video element to be available...");
         // Wait for React to render the video element
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
         videoElement = videoRef.current;
       }
-      
+
       if (!videoElement) {
         throw new Error("Video element not found in DOM");
       }
-      
-      console.log("✓ Video element found:", videoElement);
-      
+
+
       videoElement.srcObject = stream;
-      console.log("✓ Stream assigned to video element");
-      
+
       // Wait for video to be ready
       await new Promise((resolve, reject) => {
         videoElement.onloadedmetadata = () => {
-          console.log("✓ Video metadata loaded");
           console.log("📐 Video dimensions:", {
             width: videoElement.videoWidth,
-            height: videoElement.videoHeight
+            height: videoElement.videoHeight,
           });
           resolve();
         };
-        
+
         videoElement.onerror = (e) => {
-          console.error("❌ Video element error:", e);
           reject(new Error("Video stream error"));
         };
-        
+
         // Timeout fallback
         setTimeout(() => {
           if (videoElement.readyState >= videoElement.HAVE_METADATA) {
@@ -119,38 +109,33 @@ function UploadPage() {
           }
         }, 3000);
       });
-      
+
       // Play the video
       await videoElement.play();
-      console.log("✓ Video playing successfully!");
-      
+
       setCameraActive(true);
       setCameraLoading(false);
-      
+
       // Reset file selection when switching to camera
       setSelectedFile(null);
       setPreview(null);
-      console.log("✓ File selection cleared");
-      
-      console.log("🎉 Camera started successfully!");
-      
+
     } catch (err) {
-      console.error("❌ [ERROR] Camera startup failed:", err);
       console.error("Error name:", err.name);
       console.error("Error message:", err.message);
-      
+
       let errorMessage = "Cannot access camera. ";
-      
-      if (err.name === 'NotAllowedError') {
+
+      if (err.name === "NotAllowedError") {
         errorMessage += "Please allow camera permissions.";
-      } else if (err.name === 'NotFoundError') {
+      } else if (err.name === "NotFoundError") {
         errorMessage += "No camera found on this device.";
-      } else if (err.name === 'NotReadableError') {
+      } else if (err.name === "NotReadableError") {
         errorMessage += "Camera is already in use by another application.";
       } else {
         errorMessage += "Please check permissions and try again.";
       }
-      
+
       setCameraError(errorMessage);
       notify("error", errorMessage);
       setUploadMethod("file");
@@ -160,9 +145,8 @@ function UploadPage() {
   };
 
   const stopCamera = () => {
-    console.log("🛑 Stopping camera...");
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => {
+      streamRef.current.getTracks().forEach((track) => {
         console.log(`Stopping track: ${track.kind}`);
         track.stop();
       });
@@ -186,20 +170,23 @@ function UploadPage() {
 
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    
+
     // Check if video is actually playing and has data
     if (video.readyState !== video.HAVE_ENOUGH_DATA) {
       notify("error", "Video not ready. Please wait a moment and try again.");
       return;
     }
-    
-    const context = canvas.getContext('2d');
+
+    const context = canvas.getContext("2d");
 
     // Set canvas dimensions to match video
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
 
-    console.log("📐 Capture dimensions:", { width: canvas.width, height: canvas.height });
+    console.log("📐 Capture dimensions:", {
+      width: canvas.width,
+      height: canvas.height,
+    });
 
     // Check for valid dimensions
     if (canvas.width === 0 || canvas.height === 0) {
@@ -212,27 +199,31 @@ function UploadPage() {
     console.log("✓ Image drawn to canvas");
 
     // Convert canvas to blob and create file
-    canvas.toBlob((blob) => {
-      if (!blob) {
-        notify("error", "Failed to capture image. Please try again.");
-        return;
-      }
-      
-      console.log("✓ Blob created, size:", blob.size);
-      
-      const file = new File([blob], `capture-${Date.now()}.jpg`, { 
-        type: 'image/jpeg' 
-      });
-      
-      setSelectedFile(file);
-      setPreview(canvas.toDataURL('image/jpeg'));
-      
-      // Stop camera after capture
-      stopCamera();
-      setUploadMethod("file");
-      
-      notify("success", "Image captured successfully!");
-    }, 'image/jpeg', 0.95);
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) {
+          notify("error", "Failed to capture image. Please try again.");
+          return;
+        }
+
+        console.log("✓ Blob created, size:", blob.size);
+
+        const file = new File([blob], `capture-${Date.now()}.jpg`, {
+          type: "image/jpeg",
+        });
+
+        setSelectedFile(file);
+        setPreview(canvas.toDataURL("image/jpeg"));
+
+        // Stop camera after capture
+        stopCamera();
+        setUploadMethod("file");
+
+        notify("success", "Image captured successfully!");
+      },
+      "image/jpeg",
+      0.95
+    );
   };
 
   const cancelCamera = () => {
@@ -248,7 +239,7 @@ function UploadPage() {
       setSelectedFile(file);
       setPreview(URL.createObjectURL(file));
       setUploadMethod("file");
-      
+
       // Stop camera if active
       if (cameraActive) {
         stopCamera();
@@ -260,11 +251,11 @@ function UploadPage() {
   const handleDrop = (e) => {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith('image/')) {
+    if (file && file.type.startsWith("image/")) {
       setSelectedFile(file);
       setPreview(URL.createObjectURL(file));
       setUploadMethod("file");
-      
+
       if (cameraActive) {
         stopCamera();
       }
@@ -302,6 +293,7 @@ function UploadPage() {
       const data = res.data;
       console.log(data);
       setSaveData(data.storeRecent._id.toString());
+      setStoredData(data.storeRecent)
       if (mode === "classify") {
         setResults(data);
       } else if (mode === "count") {
@@ -348,7 +340,6 @@ function UploadPage() {
       });
   }
 
-  // Helper function to render screw details from the result data
   const renderScrewDetails = (resultData) => {
     if (!resultData?.success || !resultData.result) {
       return (
@@ -455,15 +446,28 @@ function UploadPage() {
                 <span className="detail-label">ID</span>
                 <span className="detail-value">{screw._id || "N/A"}</span>
               </div>
-              <div className="detail-item">
-                <span className="detail-label">Database Version</span>
-                <span className="detail-value">{screw.__v || "0"}</span>
-              </div>
             </div>
           </div>
         </div>
       </>
     );
+  };
+
+  const handleDownload = async () => {
+    const response = await fetch(
+      `${import.meta.env.VITE_APP_API}api/v1/download-report`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "authorization" : `Bearer ${getToken()}` },
+        body: JSON.stringify({ result:results.result || results, storeRecent:storedData,mode:mode }),
+      }
+    );
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${storedData.name}.pdf`;
+    a.click();
   };
 
   return (
@@ -477,10 +481,10 @@ function UploadPage() {
           onSubmit={handleSave}
           alreadySaved={false}></NamingModal>
       )}
-      
+
       {/* Hidden canvas for image capture */}
-      <canvas ref={canvasRef} style={{ display: 'none' }} />
-      
+      <canvas ref={canvasRef} style={{ display: "none" }} />
+
       {/* Main Content - Horizontal Layout */}
       <main className="upload-main-horizontal">
         {/* Left Section - Image Upload */}
@@ -491,19 +495,21 @@ function UploadPage() {
             {/* Upload Method Selection */}
             <div className="upload-method-selection">
               <button
-                className={`method-btn ${uploadMethod === 'file' ? 'active' : ''}`}
+                className={`method-btn ${
+                  uploadMethod === "file" ? "active" : ""
+                }`}
                 onClick={() => {
-                  setUploadMethod('file');
+                  setUploadMethod("file");
                   if (cameraActive) stopCamera();
-                }}
-              >
+                }}>
                 📁 File Upload
               </button>
               <button
-                className={`method-btn ${uploadMethod === 'camera' ? 'active' : ''}`}
-                onClick={() => setUploadMethod('camera')}
-                disabled={cameraLoading}
-              >
+                className={`method-btn ${
+                  uploadMethod === "camera" ? "active" : ""
+                }`}
+                onClick={() => setUploadMethod("camera")}
+                disabled={cameraLoading}>
                 {cameraLoading ? "🔄 Starting..." : "📷 Use Camera"}
               </button>
             </div>
@@ -516,12 +522,11 @@ function UploadPage() {
             )}
 
             {/* File Upload Area */}
-            {uploadMethod === 'file' && (
-              <label 
+            {uploadMethod === "file" && (
+              <label
                 className="upload-box"
                 onDrop={handleDrop}
-                onDragOver={handleDragOver}
-              >
+                onDragOver={handleDragOver}>
                 <div className="upload-icon">
                   <svg
                     width="48"
@@ -546,25 +551,27 @@ function UploadPage() {
             )}
 
             {/* Camera Capture Area - ALWAYS RENDER VIDEO ELEMENT WHEN IN CAMERA MODE */}
-            {uploadMethod === 'camera' && (
+            {uploadMethod === "camera" && (
               <div className="camera-section">
                 {/* Always render the video element, but control visibility */}
-                <div className="camera-preview" style={{ 
-                  display: cameraActive ? 'block' : 'none',
-                  position: 'relative'
-                }}>
-                  <video 
-                    ref={videoRef} 
-                    autoPlay 
+                <div
+                  className="camera-preview"
+                  style={{
+                    display: cameraActive ? "block" : "none",
+                    position: "relative",
+                  }}>
+                  <video
+                    ref={videoRef}
+                    autoPlay
                     playsInline
                     muted
                     className="camera-video"
-                    style={{ 
-                      width: '100%', 
-                      height: 'auto',
-                      backgroundColor: '#000',
-                      display: 'block',
-                      borderRadius: '8px'
+                    style={{
+                      width: "100%",
+                      height: "auto",
+                      backgroundColor: "#000",
+                      display: "block",
+                      borderRadius: "8px",
                     }}
                   />
                   <div className="camera-status">
@@ -592,16 +599,10 @@ function UploadPage() {
                 {/* Camera controls - only show when camera is active */}
                 {cameraActive && (
                   <div className="camera-controls">
-                    <button 
-                      onClick={captureImage}
-                      className="capture-btn"
-                    >
+                    <button onClick={captureImage} className="capture-btn">
                       📸 Capture Image
                     </button>
-                    <button 
-                      onClick={cancelCamera}
-                      className="cancel-btn"
-                    >
+                    <button onClick={cancelCamera} className="cancel-btn">
                       ❌ Cancel
                     </button>
                   </div>
@@ -706,6 +707,7 @@ function UploadPage() {
                   className="save-btn">
                   {loadingSave ? "Saving..." : "💾 Save Result"}
                 </button>
+                <button className="download-btn" onClick={handleDownload}>Download Report</button>
               </div>
             )}
 
