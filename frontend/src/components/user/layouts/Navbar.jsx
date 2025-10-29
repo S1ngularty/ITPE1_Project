@@ -5,12 +5,45 @@ import SearchBar from "../search-bar";
 import useNavbar from "../../../hooks/user/useNavbar";
 import ConfirmationModal from "../ConfirmationModal";
 import FilterContainer from "../FilterContainer";
-import { Filter } from "lucide-react";
+import SavedScrewsModal from "../SavedScrewsModal";
+import { Filter, Bookmark } from "lucide-react";
 
 function Navbar({ searchKeyword, applyResult }) {
   const { isLogin, setShowModal, showModal, filterData } = useNavbar();
   const [showFilter, setShowFilter] = useState(false);
+  const [showSavedScrews, setShowSavedScrews] = useState(false);
   const navigate = useNavigate();
+
+  // Fetch saved screws when modal opens
+  const handleShowSavedScrews = async () => {
+    if (!isLogin) {
+      navigate("/login");
+      return;
+    }
+    
+    
+    setShowSavedScrews(true);
+  };
+
+  // Handle unlike screw
+  const handleUnlikeScrew = async (screwId) => {
+    try {
+      // Replace with your actual API call
+      const response = await fetch(`/api/user/saved-screws/${screwId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      
+      if (response.ok) {
+        // Successfully removed from backend
+        console.log('Screw removed from saved');
+      }
+    } catch (error) {
+      console.error('Error removing screw:', error);
+    }
+  };
 
   function handleLogout() {
     localStorage.removeItem("token");
@@ -31,6 +64,12 @@ function Navbar({ searchKeyword, applyResult }) {
           onConfirm={handleLogout}
         />
       )}
+
+      <SavedScrewsModal
+        isOpen={showSavedScrews}
+        onClose={() => setShowSavedScrews(false)}
+        onUnlikeScrew={handleUnlikeScrew}
+      />
 
       <div className="navbar-logo">
         <span className="navbar-icon">⚙</span> ScrewIT
@@ -64,6 +103,17 @@ function Navbar({ searchKeyword, applyResult }) {
           <Link to="/save-analyses" className="navbar-link">
             Save Analyses
           </Link>
+          
+          {/* Saved Screws Button */}
+          <button
+            className="navbar-saved-button"
+            onClick={handleShowSavedScrews}
+            title="View saved screws"
+          >
+            <Bookmark size={20} />
+            <span className="saved-count">
+            </span>
+          </button>
         </div>
       )}
 
