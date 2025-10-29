@@ -25,26 +25,6 @@ function Navbar({ searchKeyword, applyResult }) {
     setShowSavedScrews(true);
   };
 
-  // Handle unlike screw
-  const handleUnlikeScrew = async (screwId) => {
-    try {
-      // Replace with your actual API call
-      const response = await fetch(`/api/user/saved-screws/${screwId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      
-      if (response.ok) {
-        // Successfully removed from backend
-        console.log('Screw removed from saved');
-      }
-    } catch (error) {
-      console.error('Error removing screw:', error);
-    }
-  };
-
   function handleLogout() {
     localStorage.removeItem("token");
     navigate("/");
@@ -68,7 +48,6 @@ function Navbar({ searchKeyword, applyResult }) {
       <SavedScrewsModal
         isOpen={showSavedScrews}
         onClose={() => setShowSavedScrews(false)}
-        onUnlikeScrew={handleUnlikeScrew}
       />
 
       <div className="navbar-logo">

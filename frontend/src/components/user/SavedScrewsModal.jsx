@@ -1,38 +1,51 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import "../../styles/user/components/SavedScrewsModal.css";
-import axios from "axios"
+import axios from "axios";
 import { getToken } from "../../utils/authUtil";
 
-const SavedScrewsModal = ({ isOpen, onClose, onUnlikeScrew }) => {
+const SavedScrewsModal = ({ isOpen, onClose }) => {
   const [localSavedScrews, setLocalSavedScrews] = useState([]);
 
-  async function fetchSavedScrews(){
-    await axios.get(`${import.meta.env.VITE_APP_API}api/v1/likes`,{
-      headers:{
-        Authorization:`Bearer ${getToken()}`
-      }
-    }).then(response=>{
-      setLocalSavedScrews(response.data.result[0]?.savedScrews || [])
-    }).catch(error=>console.log(error))
+  async function fetchSavedScrews() {
+    await axios
+      .get(`${import.meta.env.VITE_APP_API}api/v1/likes`, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
+      .then((response) => {
+        setLocalSavedScrews(response.data.result[0]?.savedScrews || []);
+      })
+      .catch((error) => console.log(error));
   }
 
-  useEffect(()=>{
-    fetchSavedScrews()
-  },[])
+  useEffect(() => {
+    fetchSavedScrews();
+  }, []);
 
-  useEffect(()=>{
-  },[localSavedScrews])
+  // useEffect(()=>{
+  // },[localSavedScrews])
 
   if (!isOpen) return null;
 
-  const handleUnlike = (screwId) => {
-    setLocalSavedScrews(prev => prev.filter(screw => screw.screwId._id !== screwId));
-    
-    // Call parent function to handle actual unlike
-    if (onUnlikeScrew) {
-      onUnlikeScrew(screwId);
-    }
+  const handleUnlike = async (screwId) => {
+    await axios
+      .post(
+        `${import.meta.env.VITE_APP_API}api/v1/likes/remove`,
+        { screwId },
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
+      .then((response) => {
+        setLocalSavedScrews((prev) =>
+          prev.filter((screw) => screw.screwId._id !== screwId)
+        );
+      })
+      .catch((error) => console.log(error));
   };
 
   return (
@@ -58,9 +71,8 @@ const SavedScrewsModal = ({ isOpen, onClose, onUnlikeScrew }) => {
                     <button
                       className="like-button liked"
                       onClick={() => handleUnlike(screw.screwId._id)}
-                      title="Remove from saved"
-                    >
-                      ❤️
+                      title="Remove from saved">
+                      ♡
                     </button>
                   </div>
 
@@ -72,35 +84,41 @@ const SavedScrewsModal = ({ isOpen, onClose, onUnlikeScrew }) => {
                         alt={screw.screwId.name}
                         className="screw-image"
                         onError={(e) => {
-                          e.target.style.display = 'none';
-                          e.target.nextSibling.style.display = 'flex';
+                          e.target.style.display = "none";
+                          e.target.nextSibling.style.display = "flex";
                         }}
                       />
                     ) : null}
-                    <div className="screw-image-placeholder">
-                      🔩
-                    </div>
+                    <div className="screw-image-placeholder">🔩</div>
                   </div>
 
                   {/* Screw Details */}
                   <div className="screw-details">
                     <div className="screw-category">
-                      <span className="category-badge">{screw.screwId.category}</span>
+                      <span className="category-badge">
+                        {screw.screwId.category}
+                      </span>
                     </div>
 
                     {/* Specifications */}
                     <div className="screw-specs">
                       <div className="spec-item">
                         <span className="spec-label">Material:</span>
-                        <span className="spec-value">{screw.screwId.material}</span>
+                        <span className="spec-value">
+                          {screw.screwId.material}
+                        </span>
                       </div>
                       <div className="spec-item">
                         <span className="spec-label">Driver Type:</span>
-                        <span className="spec-value">{screw.screwId.driverType}</span>
+                        <span className="spec-value">
+                          {screw.screwId.driverType}
+                        </span>
                       </div>
                       <div className="spec-item">
                         <span className="spec-label">Thread Type:</span>
-                        <span className="spec-value">{screw.screwId.threadedType}</span>
+                        <span className="spec-value">
+                          {screw.screwId.threadedType}
+                        </span>
                       </div>
                     </div>
 
@@ -122,7 +140,9 @@ const SavedScrewsModal = ({ isOpen, onClose, onUnlikeScrew }) => {
                     {screw.screwId.strength && (
                       <div className="screw-strength">
                         <span className="strength-label">Strength:</span>
-                        <p className="strength-value">{screw.screwId.strength}</p>
+                        <p className="strength-value">
+                          {screw.screwId.strength}
+                        </p>
                       </div>
                     )}
 
