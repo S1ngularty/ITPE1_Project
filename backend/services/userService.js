@@ -100,3 +100,4 @@ exports.getName = async (user) => {
   if (!username) throw new Error("cannot find the user on the collection");
   return username;
 };
+

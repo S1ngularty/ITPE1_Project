@@ -34,6 +34,7 @@ const Dashboard = () => {
       const data = await response.json();
 
       if (data.success) {
+        console.log(data)
         setUserData(transformApiData(data.result));
       } else {
         throw new Error("API returned unsuccessful response");
