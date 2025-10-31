@@ -73,31 +73,49 @@ const dashboardInfo = async (user) => {
       },
       {
         $addFields: {
-          services: { $arrayToObject: "$service" },
+          service: { $arrayToObject: "$service" },
         },
       },
       { $sort: { "_id.year": 1, "_id.month": 1 } },
     ]),
   ]);
 
-  console.log(graphData);
+  // console.log(graphData);
   // console.log(history, requestUsage);
   let isSave = [];
   let notSave = [];
   const months = [
-    "January",
-    "February",
-    "March",
-    "April",
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
     "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
   ];
+  let i = 0;
+  let graphDataUsage = months.map((month, index) => {
+    if ( i < graphData.length && graphData[i]._id.month - 1 === index) {
+      let temp = {
+        month,
+        classification: graphData[i].service.classification || 0,
+        count: graphData[i].service.count || 0,
+      };
+      i++;
+      return temp;
+    }
+
+    return {
+      month,
+      classification: 0,
+      count: 0,
+    };
+  });
 
   for (let activity of history) {
     // console.log(activity)
@@ -108,7 +126,7 @@ const dashboardInfo = async (user) => {
     notSave.push(activity);
   }
 
-  return { activity: { isSave, notSave }, requestUsage, graphData };
+  return { activity: { isSave, notSave }, requestUsage, graphDataUsage };
 };
 
 const editSaveAnalyses = async (request) => {

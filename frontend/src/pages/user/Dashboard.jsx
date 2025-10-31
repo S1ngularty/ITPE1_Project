@@ -3,8 +3,10 @@ import "../../styles/user/pages/Dashboard.css";
 import Navbar from "../../components/user/layouts/Navbar";
 import { getToken } from "../../utils/authUtil";
 import { useNavigate } from "react-router-dom";
+import Chart from "../../components/user/Chart";
 const Dashboard = () => {
   const [userData, setUserData] = useState(null);
+  const [graphData, setGraphData]= useState([])
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -48,7 +50,8 @@ const Dashboard = () => {
   };
 
   const transformApiData = (result) => {
-    const { activity, requestUsage } = result;
+    const { activity, requestUsage, graphDataUsage } = result;
+    setGraphData(graphDataUsage)
     const allActivities = [...activity.isSave, ...activity.notSave];
 
     // Sort by createdAt date (most recent first)
@@ -251,6 +254,11 @@ const Dashboard = () => {
                   </div>
                 </div>
               </div>
+            </div>
+
+              {/* chart */}
+            <div className="dashboard-card dashboard-chart">
+              <Chart data={graphData} title={"Request usage over time"}></Chart>
             </div>
 
             {/* Usage Summary */}
