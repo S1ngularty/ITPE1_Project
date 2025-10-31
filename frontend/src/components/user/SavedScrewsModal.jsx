@@ -21,7 +21,7 @@ const SavedScrewsModal = ({ isOpen, onClose }) => {
   }
 
   useEffect(() => {
-    fetchSavedScrews();
+   getToken() && fetchSavedScrews();
   }, []);
 
   // useEffect(()=>{

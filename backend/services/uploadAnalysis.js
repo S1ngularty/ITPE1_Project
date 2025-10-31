@@ -46,31 +46,58 @@ const dashboardInfo = async (user) => {
     UploadAnalysis.find({ user: user.userId }).exec(),
     UploadAnalysis.find({ user: user.userId }).countDocuments().exec(),
     UploadAnalysis.aggregate([
+      { $match: { user: new mongoose.Types.ObjectId(user.userId) } },
       {
-        $match: {
-          user: new mongoose.Types.ObjectId(user.userId),
+        $group: {
+          _id: {
+            year: { $year: "$createdAt" },
+            month: { $month: "$createdAt" },
+            service: "$typeOfService",
+          },
+          count: { $sum: 1 },
         },
       },
       {
-        $group:{
-            _id:{
-                year:{$year:"$createdAt"},
-                month:{$month:"$createdAt"},
-                service:"$typeOfService"
+        $group: {
+          _id: {
+            year: "$_id.year",
+            month: "$_id.month",
+          },
+          service: {
+            $push: {
+              k: "$_id.service",
+              v: "$count",
             },
-            count:{$sum:1}
-        }
+          },
+        },
       },
       {
-        $sort:{"_id.year":1, "_id.month":1}
-      }
+        $addFields: {
+          services: { $arrayToObject: "$service" },
+        },
+      },
+      { $sort: { "_id.year": 1, "_id.month": 1 } },
     ]),
   ]);
 
-//   console.log(graphData)
+  console.log(graphData);
   // console.log(history, requestUsage);
   let isSave = [];
   let notSave = [];
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
 
   for (let activity of history) {
     // console.log(activity)
@@ -81,7 +108,7 @@ const dashboardInfo = async (user) => {
     notSave.push(activity);
   }
 
-  return { activity: { isSave, notSave }, requestUsage,graphData };
+  return { activity: { isSave, notSave }, requestUsage, graphData };
 };
 
 const editSaveAnalyses = async (request) => {
