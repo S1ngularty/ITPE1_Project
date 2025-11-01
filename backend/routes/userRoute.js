@@ -26,6 +26,7 @@ router.get("/getDashboard",authMiddleware.verifyToken, userActivityController.ge
 
 router.post("/saved/:analysesRecordId",authMiddleware.verifyToken,userActivityController.editRecordAnalyses)
 router.post("/unsaved",authMiddleware.verifyToken,userActivityController.unsaveRecordAnalyses)
+router.get("/getRecentAnalysis",authMiddleware.verifyToken,userActivityController.getRecentAnalysis)
 
 router.post("/likes/add",authMiddleware.verifyToken,userActivityController.saveScrew)
 router.post("/likes/remove",authMiddleware.checkForAuth,userActivityController.removeToLikes)

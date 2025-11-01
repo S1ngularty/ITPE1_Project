@@ -4,7 +4,8 @@ const {
   fetchSaveAnalysis,
   editSaveAnalyses,
   unsavedAnalyses,
-  downloadAnalysis
+  downloadAnalysis,
+  RecentAnalysis,
 } = require("../services/uploadAnalysis");
 
 const savedScrewService = require("../services/savedScrews");
@@ -137,14 +138,33 @@ const getLikedScrews = async (req, res) => {
   }
 };
 
-const downloadAnalysisPdf = async(req,res)=>{
+const downloadAnalysisPdf = async (req, res) => {
   try {
-    const result = await downloadAnalysis(req,(filePath,filename)=>res.download(filePath,filename))
+    const result = await downloadAnalysis(req, (filePath, filename) =>
+      res.download(filePath, filename)
+    );
   } catch (error) {
-   console.log(error)
-   return res.status(500).json({error:"failed to download the analysis result"}) 
+    console.log(error);
+    return res
+      .status(500)
+      .json({ error: "failed to download the analysis result" });
   }
-}
+};
+
+const getRecentAnalysis = async (req, res) => {
+  try {
+    const result = await RecentAnalysis(req);
+    return res.status(200).json({
+      success: true,
+      result,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ error: "failed to download the analysis result" });
+  }
+};
 
 module.exports = {
   downloadAnalysisPdf,
@@ -156,4 +176,5 @@ module.exports = {
   unsaveRecordAnalyses,
   saveScrew,
   removeToLikes,
+  getRecentAnalysis,
 };

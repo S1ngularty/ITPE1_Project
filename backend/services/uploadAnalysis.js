@@ -14,8 +14,8 @@ const recentUploads = async (request) => {
 const saveUploads = async (request) => {
   if (!request.body) throw new Error("empty request");
   const { activityID, name } = request.body;
-  if (!activityID) throw new Error("screw ID is indefined");
-  if (!name) throw new Error("name is indefined");
+  if (!activityID) throw new Error("screw ID is undefined");
+  if (!name) throw new Error("name is undefined");
 
   console.log(activityID);
   const updateActivity = await UploadAnalysis.findById(activityID).exec();
@@ -475,6 +475,13 @@ const downloadAnalysis = async (request, download) => {
   });
 };
 
+const RecentAnalysis = async (request)=>{
+  const {limit} = request.query || null
+  const recent = await UploadAnalysis.find({user:request.user.userId}).limit(limit || 0).sort({createdAt:-1})
+  console.log(recent)
+  return recent
+}
+
 module.exports = {
   saveUploads,
   fetchSaveAnalysis,
@@ -482,4 +489,5 @@ module.exports = {
   editSaveAnalyses,
   unsavedAnalyses,
   downloadAnalysis,
+  RecentAnalysis
 };

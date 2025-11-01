@@ -14,7 +14,7 @@ function UploadPage() {
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState(null);
-  const [storedData,setStoredData] = useState({})
+  const [storedData, setStoredData] = useState({});
   const [mode, setMode] = useState("classify");
   const [loadingSave, setLoadingSave] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -23,16 +23,25 @@ function UploadPage() {
   const [uploadMethod, setUploadMethod] = useState("file");
   const [cameraError, setCameraError] = useState("");
   const [cameraLoading, setCameraLoading] = useState(false);
+  const [recentAnalysis, setRecentAnalysis] = useState([]);
 
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const canvasRef = useRef(null);
 
-  const history = [
-    { id: 1, name: "screw_01.png" },
-    { id: 2, name: "hole_02.jpg" },
-    { id: 3, name: "part_03.png" },
-  ];
+  useEffect(() => {
+    axios
+      .get(`${import.meta.env.VITE_APP_API}api/v1/getRecentAnalysis?limit=3`, {
+        headers: {
+          authorization: `Bearer ${getToken()}`,
+        },
+      })
+      .then((response) => {
+        setRecentAnalysis(response.data.result)
+        console.log(response.data.result)
+      })
+      .catch((error) => console.log(error));
+  }, []);
 
   // Clean up camera on unmount
   useEffect(() => {
@@ -51,7 +60,6 @@ function UploadPage() {
   }, [uploadMethod, cameraActive, cameraLoading]);
 
   const startCamera = async () => {
-
     try {
       setCameraError("");
       setCameraLoading(true);
@@ -84,7 +92,6 @@ function UploadPage() {
       if (!videoElement) {
         throw new Error("Video element not found in DOM");
       }
-
 
       videoElement.srcObject = stream;
 
@@ -119,7 +126,6 @@ function UploadPage() {
       // Reset file selection when switching to camera
       setSelectedFile(null);
       setPreview(null);
-
     } catch (err) {
       console.error("Error name:", err.name);
       console.error("Error message:", err.message);
@@ -293,7 +299,7 @@ function UploadPage() {
       const data = res.data;
       console.log(data);
       setSaveData(data.storeRecent._id.toString());
-      setStoredData(data.storeRecent)
+      setStoredData(data.storeRecent);
       if (mode === "classify") {
         setResults(data);
       } else if (mode === "count") {
@@ -458,8 +464,15 @@ function UploadPage() {
       `${import.meta.env.VITE_APP_API}api/v1/download-report`,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json", "authorization" : `Bearer ${getToken()}` },
-        body: JSON.stringify({ result:results.result || results, storeRecent:storedData,mode:mode }),
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${getToken()}`,
+        },
+        body: JSON.stringify({
+          result: results.result || results,
+          storeRecent: storedData,
+          mode: mode,
+        }),
       }
     );
     const blob = await response.blob();
@@ -479,7 +492,8 @@ function UploadPage() {
           onClose={() => setShowModal(false)}
           currValue={`Analysis-${Date.now()}`}
           onSubmit={handleSave}
-          alreadySaved={false}></NamingModal>
+          alreadySaved={false}
+        ></NamingModal>
       )}
 
       {/* Hidden canvas for image capture */}
@@ -501,7 +515,8 @@ function UploadPage() {
                 onClick={() => {
                   setUploadMethod("file");
                   if (cameraActive) stopCamera();
-                }}>
+                }}
+              >
                 📁 File Upload
               </button>
               <button
@@ -509,7 +524,8 @@ function UploadPage() {
                   uploadMethod === "camera" ? "active" : ""
                 }`}
                 onClick={() => setUploadMethod("camera")}
-                disabled={cameraLoading}>
+                disabled={cameraLoading}
+              >
                 {cameraLoading ? "🔄 Starting..." : "📷 Use Camera"}
               </button>
             </div>
@@ -526,14 +542,16 @@ function UploadPage() {
               <label
                 className="upload-box"
                 onDrop={handleDrop}
-                onDragOver={handleDragOver}>
+                onDragOver={handleDragOver}
+              >
                 <div className="upload-icon">
                   <svg
                     width="48"
                     height="48"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="currentColor">
+                    stroke="currentColor"
+                  >
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                     <polyline points="17 8 12 3 7 8" />
                     <line x1="12" y1="3" x2="12" y2="15" />
@@ -559,7 +577,8 @@ function UploadPage() {
                   style={{
                     display: cameraActive ? "block" : "none",
                     position: "relative",
-                  }}>
+                  }}
+                >
                   <video
                     ref={videoRef}
                     autoPlay
@@ -626,7 +645,8 @@ function UploadPage() {
               <div className="mode-buttons">
                 <button
                   className={`mode-btn ${mode === "classify" ? "active" : ""}`}
-                  onClick={() => setMode("classify")}>
+                  onClick={() => setMode("classify")}
+                >
                   <span className="mode-icon">🔍</span>
                   <span className="mode-text">
                     <strong>Classification</strong>
@@ -635,7 +655,8 @@ function UploadPage() {
                 </button>
                 <button
                   className={`mode-btn ${mode === "count" ? "active" : ""}`}
-                  onClick={() => setMode("count")}>
+                  onClick={() => setMode("count")}
+                >
                   <span className="mode-icon">🔢</span>
                   <span className="mode-text">
                     <strong>Counting</strong>
@@ -649,7 +670,8 @@ function UploadPage() {
             <button
               onClick={handleAnalyze}
               disabled={loading || !selectedFile}
-              className="analyze-btn">
+              className="analyze-btn"
+            >
               {loading ? (
                 <>
                   <div className="btn-spinner"></div>
@@ -704,10 +726,13 @@ function UploadPage() {
                 <button
                   onClick={() => setShowModal(true)}
                   disabled={loadingSave}
-                  className="save-btn">
+                  className="save-btn"
+                >
                   {loadingSave ? "Saving..." : "💾 Save Result"}
                 </button>
-                <button className="download-btn" onClick={handleDownload}>Download Report</button>
+                <button className="download-btn" onClick={handleDownload}>
+                  Download Report
+                </button>
               </div>
             )}
 
@@ -726,8 +751,8 @@ function UploadPage() {
           <div className="section-card">
             <h2>Recent Uploads</h2>
             <div className="history-list">
-              {history.map((item) => (
-                <div key={item.id} className="history-item">
+              {recentAnalysis.map((item) => (
+                <div key={item._id} className="history-item">
                   <span className="file-icon">📄</span>
                   <span className="file-name">{item.name}</span>
                 </div>
