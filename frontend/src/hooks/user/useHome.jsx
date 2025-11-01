@@ -31,7 +31,9 @@ function useHome() {
         const data = response.data.result.name.split(" ")[0] || "Guest";
         setName(data);
       })
-      .catch((error) => console.log(error));
+      .catch((error) => {
+        localStorage.clear()
+        console.log(error)});
   }
 
   useEffect(() => {
