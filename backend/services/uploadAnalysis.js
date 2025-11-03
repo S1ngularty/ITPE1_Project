@@ -44,7 +44,7 @@ const dashboardInfo = async (user) => {
 
   const [history, requestUsage, graphData] = await Promise.all([
     UploadAnalysis.find({ user: user.userId }).exec(),
-    UploadAnalysis.find({ user: user.userId }).countDocuments().exec(),
+    UploadAnalysis.find({ user: user.userId, createdAt:{$gte:Date.now()}}).countDocuments().exec(),
     UploadAnalysis.aggregate([
       { $match: { user: new mongoose.Types.ObjectId(user.userId) } },
       {
