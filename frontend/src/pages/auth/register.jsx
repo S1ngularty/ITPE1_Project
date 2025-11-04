@@ -47,54 +47,99 @@ function Register() {
 
   return (
     <div className="register-page">
-      <form className="register-form" onSubmit={handleSubmit}>
-        <h2 className="form-title">Create an Account</h2>
+      <div className="register-container">
+        {/* Left Side - Create Account */}
+        <div className="register-side-section">
+          <div className="side-content">
+            <h2 className="side-title">Welcome Back</h2>
+            <p className="side-description">
+              Already have an account? Sign in to access your screw classification dashboard and continue managing your inventory.
+            </p>
+            <a href="/login" className="login-button">
+              SIGN IN
+            </a>
+          </div>
+        </div>
 
-        <input
-          type="text"
-          placeholder="Full Name"
-          value={formData.name}
-          onChange={(e) => inputHandler("name", e)}
-          required
-        />
+        {/* Right Side - Form */}
+        <div className="register-form-section">
+          <div className="form-header">
+            <h1 className="register-title">SCREW<span className="register-title-accent">IT</span></h1>
+            <p className="register-subtitle">Screw Classification & Counting System</p>
+          </div>
 
-        <input
-          type="email"
-          placeholder="Email Address"
-          value={formData.email}
-          onChange={(e) => inputHandler("email", e)}
-          required
-        />
+          <div className="form-container">
+            <h2 className="form-title">Create an account</h2>
+            
+            <form onSubmit={handleSubmit} className="register-form">
+              <div className="input-group">
+                <label className="input-label">Full Name</label>
+                <input
+                  type="text"
+                  placeholder="Enter your full name"
+                  value={formData.name}
+                  onChange={(e) => inputHandler("name", e)}
+                  className="register-input"
+                  required
+                />
+              </div>
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={(e) => inputHandler("password", e)}
-          required
-        />
+              <div className="input-group">
+                <label className="input-label">Email Address</label>
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  value={formData.email}
+                  onChange={(e) => inputHandler("email", e)}
+                  className="register-input"
+                  required
+                />
+              </div>
 
-        <input
-          type="password"
-          placeholder="Confirm Password"
-          value={formData.confirmPassword}
-          onChange={(e) => inputHandler("confirmPassword", e)}
-          required
-        />
+              <div className="input-group">
+                <label className="input-label">Password</label>
+                <input
+                  type="password"
+                  placeholder="Enter your password"
+                  value={formData.password}
+                  onChange={(e) => inputHandler("password", e)}
+                  className="register-input"
+                  required
+                />
+              </div>
 
-        {error && <div className="form-error">{error}</div>}
+              <div className="input-group">
+                <label className="input-label">Confirm Password</label>
+                <input
+                  type="password"
+                  placeholder="Confirm your password"
+                  value={formData.confirmPassword}
+                  onChange={(e) => inputHandler("confirmPassword", e)}
+                  className="register-input"
+                  required
+                />
+              </div>
 
-        <button type="submit" disabled={loading}>
-          {loading ? "Registering..." : "Sign Up"}
-        </button>
+              {error && <div className="register-error">{error}</div>}
 
-        <p className="form-footer">
-          Already have an account?{" "}
-          <a href="/login" className="form-link">
-            Log in
-          </a>
-        </p>
-      </form>
+              <button 
+                type="submit" 
+                className="register-button" 
+                disabled={loading}
+              >
+                {loading ? (
+                  <span className="button-loading">
+                    <span className="spinner"></span>
+                    CREATING ACCOUNT...
+                  </span>
+                ) : (
+                  "SIGN UP"
+                )}
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
