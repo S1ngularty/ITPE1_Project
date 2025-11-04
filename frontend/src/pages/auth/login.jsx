@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import notify from "../../components/user/Toast";
+import "../../styles/user/pages/auth/login.css";
 
 function Login() {
   const [credentials, setCredentials] = useState({ email: "", password: "" });
+  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -17,12 +19,15 @@ function Login() {
       .post(`${import.meta.env.VITE_APP_API}api/v1/login`, credentials)
       .then((response) => {
         localStorage.setItem("token", response.data.token);
-        notify("success","Login successfully")
+        if (rememberMe) {
+          localStorage.setItem("rememberMe", "true");
+        }
+        notify("success", "Login successfully");
         navigate("/home");
       })
       .catch((err) => {
         setError(err.response?.data?.message || "Login failed. Please try again.");
-        notify("error","Invalid input, please check your username or password")
+        notify("error", "Invalid input, please check your username or password");
       })
       .finally(() => setLoading(false));
   }
@@ -38,131 +43,95 @@ function Login() {
   }
 
   return (
-    <div style={styles.page}>
-      <div style={styles.container}>
-        <h1 style={styles.title}>ScrewIT</h1>
-        <p style={styles.subtitle}>Sign in to your account</p>
+    <div className="login-page">
+      <div className="login-container">
+        {/* Left Side - Form */}
+        <div className="login-form-section">
+          <div className="form-header">
+            <h1 className="login-title">SCREW<span className="login-title-accent">IT</span></h1>
+            <p className="login-subtitle">Screw Classification & Counting System</p>
+          </div>
 
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <input
-            type="email"
-            placeholder="Email address"
-            value={credentials.email}
-            onChange={(e) => inputHandler("email", e)}
-            style={styles.input}
-            required
-          />
+          <div className="form-container">
+            <h2 className="form-title">Sign in</h2>
+            
+            <form onSubmit={handleSubmit} className="login-form">
+              <div className="input-group">
+                <label className="input-label">Your Name</label>
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  value={credentials.email}
+                  onChange={(e) => inputHandler("email", e)}
+                  className="login-input"
+                  required
+                />
+              </div>
 
-          <input
-            type="password"
-            placeholder="Password"
-            value={credentials.password}
-            onChange={(e) => inputHandler("password", e)}
-            style={styles.input}
-            required
-          />
+              <div className="input-group">
+                <label className="input-label">Password</label>
+                <input
+                  type="password"
+                  placeholder="Enter your password"
+                  value={credentials.password}
+                  onChange={(e) => inputHandler("password", e)}
+                  className="login-input"
+                  required
+                />
+              </div>
 
-          {error && <div style={styles.error}>{error}</div>}
+              <div className="form-options">
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="checkbox-input"
+                  />
+                  <span className="checkmark"></span>
+                  Remember me
+                </label>
+                
+                <a href="/recovery-password" className="forgot-password-link">
+                  Forgot password?
+                </a>
+              </div>
 
-          <button type="submit" style={styles.button} disabled={loading}>
-            {loading ? "Signing in..." : "Sign In"}
-          </button>
-        </form>
+              {error && <div className="login-error">{error}</div>}
 
-        <p style={styles.linkText}>
-          Don’t have an account? <a href="/register" style={styles.link}>Sign up</a>
-        </p>
+              <button 
+                type="submit" 
+                className="login-button" 
+                disabled={loading}
+              >
+                {loading ? (
+                  <span className="button-loading">
+                    <span className="spinner"></span>
+                    SIGNING IN...
+                  </span>
+                ) : (
+                  "LOG IN"
+                )}
+              </button>
+            </form>
+          </div>
+        </div>
+
+        {/* Right Side - Create Account */}
+        <div className="login-side-section">
+          <div className="side-content">
+            <h2 className="side-title">Create an account</h2>
+            <p className="side-description">
+              Join our screw classification system to efficiently manage and count your inventory with advanced AI technology.
+            </p>
+            <a href="/register" className="create-account-button">
+              SIGN UP
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   );
-}
-
-const styles = {
-  page: {
-    minHeight: "100vh",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    background: "#f3f4f6", // light gray background
-    padding: "1rem",
-  },
-  container: {
-    width: "100%",
-    maxWidth: "380px",
-    padding: "2rem",
-    background: "#fff",
-    borderRadius: "12px",
-    boxShadow: "0 6px 20px rgba(0,0,0,0.08)", // soft shadow
-    textAlign: "center",
-  },
-  title: {
-    margin: "0 0 0.25rem",
-    fontSize: "1.5rem",
-    fontWeight: "700",
-    color: "#111827",
-  },
-  subtitle: {
-    margin: "0 0 1.5rem",
-    fontSize: "0.95rem",
-    color: "#6b7280",
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "1rem",
-  },
-  input: {
-    padding: "0.75rem",
-    border: "1px solid #d1d5db",
-    borderRadius: "8px",
-    fontSize: "14px",
-    outline: "none",
-    transition: "border 0.2s",
-  },
-  button: {
-    padding: "0.75rem",
-    border: "none",
-    borderRadius: "8px",
-    background: "#2563eb",
-    color: "white",
-    fontWeight: "600",
-    fontSize: "15px",
-    cursor: "pointer",
-    transition: "background 0.3s",
-  },
-  error: {
-    color: "#dc2626",
-    fontSize: "14px",
-    textAlign: "center",
-  },
-  linkText: {
-    marginTop: "1rem",
-    fontSize: "14px",
-    color: "#374151",
-  },
-  link: {
-    color: "#2563eb",
-    fontWeight: "500",
-    textDecoration: "none",
-  },
-};
-
-// Simple hover effects (inline injection)
-if (typeof document !== "undefined") {
-  const style = document.createElement("style");
-  style.textContent = `
-    input:focus {
-      border-color: #2563eb !important;
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
-    }
-    button:hover:not(:disabled) {
-      background: #1e40af;
-    }
-    a:hover {
-      text-decoration: underline;
-    }
-  `;
-  document.head.appendChild(style);
 }
 
 export default Login;
