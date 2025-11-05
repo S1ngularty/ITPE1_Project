@@ -19,7 +19,7 @@ const classify = async (request) => {
   });
 
   const screwData = await axios.post(
-    "https://serverless.roboflow.com/screw_classify-tnjdl/8",
+    "https://serverless.roboflow.com/screw_classify-tnjdl/9",
     formData,
     {
       headers: {
@@ -32,6 +32,7 @@ const classify = async (request) => {
   );
 
   const toFetchDocument = screwData.data.predicted_classes[0];
+  if(!toFetchDocument) throw new Error("failed to classify the object")
   console.log("here ", toFetchDocument);
 
   const screwDocument = await Screw.find({

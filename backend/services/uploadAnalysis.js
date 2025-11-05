@@ -42,9 +42,16 @@ const fetchSaveAnalysis = async (request) => {
 const dashboardInfo = async (user) => {
   if (!user) throw new Error("user is undefined");
 
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+
   const [history, requestUsage, graphData] = await Promise.all([
     UploadAnalysis.find({ user: user.userId }).exec(),
-    UploadAnalysis.find({ user: user.userId, createdAt:{$gte:Date.now()}}).countDocuments().exec(),
+    UploadAnalysis.countDocuments({
+      user: user.userId,
+      createdAt: { $gte: startOfMonth, $lt: endOfMonth },
+    }).exec(),
     UploadAnalysis.aggregate([
       { $match: { user: new mongoose.Types.ObjectId(user.userId) } },
       {
@@ -100,7 +107,7 @@ const dashboardInfo = async (user) => {
   ];
   let i = 0;
   let graphDataUsage = months.map((month, index) => {
-    if ( i < graphData.length && graphData[i]._id.month - 1 === index) {
+    if (i < graphData.length && graphData[i]._id.month - 1 === index) {
       let temp = {
         month,
         classification: graphData[i].service.classification || 0,
@@ -475,12 +482,14 @@ const downloadAnalysis = async (request, download) => {
   });
 };
 
-const RecentAnalysis = async (request)=>{
-  const {limit} = request.query || null
-  const recent = await UploadAnalysis.find({user:request.user.userId}).limit(limit || 0).sort({createdAt:-1})
-  console.log(recent)
-  return recent
-}
+const RecentAnalysis = async (request) => {
+  const { limit } = request.query || null;
+  const recent = await UploadAnalysis.find({ user: request.user.userId })
+    .limit(limit || 0)
+    .sort({ createdAt: -1 });
+  console.log(recent);
+  return recent;
+};
 
 module.exports = {
   saveUploads,
@@ -489,5 +498,5 @@ module.exports = {
   editSaveAnalyses,
   unsavedAnalyses,
   downloadAnalysis,
-  RecentAnalysis
+  RecentAnalysis,
 };
