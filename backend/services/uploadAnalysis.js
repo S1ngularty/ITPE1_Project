@@ -485,7 +485,7 @@ const downloadAnalysis = async (request, download) => {
 const RecentAnalysis = async (request) => {
   const { limit } = request.query || null;
   const recent = await UploadAnalysis.find({ user: request.user.userId })
-    .limit(limit || 0)
+    .limit(limit || 0).populate("screw")
     .sort({ createdAt: -1 });
   console.log(recent);
   return recent;

@@ -82,6 +82,7 @@ function Navbar({ searchKeyword, applyResult }) {
           <Link to="/save-analyses" className="navbar-link">
             Save Analyses
           </Link>
+          <Link to={"/recent-analysis"} className="navbar-link">Recent Analysis</Link>
           
           {/* Saved Screws Button */}
           <button

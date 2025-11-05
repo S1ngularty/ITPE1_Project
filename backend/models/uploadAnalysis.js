@@ -16,6 +16,10 @@ const UploadAnalysisSchema = new mongoose.Schema(
       ref: "Screw",
       default: null,
     },
+    count: {
+      type: Number,
+      default: null,
+    },
     typeOfService: {
       type: String,
       default: null,

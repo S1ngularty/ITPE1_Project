@@ -83,8 +83,8 @@ const count = async (request) => {
     uploadedImage: {
       url: upload.url,
       public_id: upload.public_id,
+      count:objectCount
     },
-    result: objectCount,
   });
 
   fs.unlink(request.file.path, () => {});
