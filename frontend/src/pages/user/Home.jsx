@@ -6,8 +6,15 @@ import ModalPreview from "../../components/user/PreviewModal";
 import useHome from "../../hooks/user/useHome";
 
 function Home() {
-  const { screws, name, error, search, selectedScrew, setSelectedScrew, cbFilter } =
-    useHome();
+  const {
+    screws,
+    name,
+    error,
+    search,
+    selectedScrew,
+    setSelectedScrew,
+    cbFilter,
+  } = useHome();
   const navigate = useNavigate();
 
   function handleUpload() {
@@ -28,18 +35,20 @@ function Home() {
           onClose={() => setSelectedScrew("")}
         />
       )}
-      
+
       <main className="main-content">
         {/* Hero Section */}
         <section className="hero-section">
           <div className="hero-content">
             <div className="hero-text">
               <h1 className="hero-title">
-                Welcome to <span className="brand-accent">ScrewIT</span>, {name}!
+                Welcome to <span className="brand-accent">ScrewIT</span>, {name}
+                !
               </h1>
               <p className="hero-subtitle">
-                Advanced screw classification and counting system. Upload images to automatically 
-                identify, classify, and count screws with precision and ease.
+                Advanced screw classification and counting system. Upload images
+                to automatically identify, classify, and count screws with
+                precision and ease.
               </p>
             </div>
             <div className="hero-stats">
@@ -62,26 +71,41 @@ function Home() {
             <div className="action-cards">
               <div className="action-card primary-action">
                 <div className="action-icon">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                  <svg
+                    width="64"
+                    height="64"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.74L20.71,20L19.29,21.41L13.03,15.14C11.88,16.1 10.4,16.69 8.79,16.69A6.5,6.5 0 0,1 2.29,10.19A6.5,6.5 0 0,1 8.79,3M8.79,5A4.5,4.5 0 0,0 4.29,9.5A4.5,4.5 0 0,0 8.79,14A4.5,4.5 0 0,0 13.29,9.5A4.5,4.5 0 0,0 8.79,5Z" />
                   </svg>
                 </div>
                 <h3>Upload & Analyze</h3>
-                <p>Upload screw images for automatic classification and counting</p>
-                <button onClick={handleUpload} className="action-btn primary-btn">
+                <p>
+                  Upload screw images for automatic classification and counting
+                </p>
+                <button
+                  onClick={handleUpload}
+                  className="action-btn primary-btn">
                   Upload Image
                 </button>
               </div>
 
               <div className="action-card secondary-action">
                 <div className="action-icon">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M17,18A2,2 0 0,1 19,20A2,2 0 0,1 17,22C15.89,22 15,21.1 15,20C15,18.89 15.89,18 17,18M1,2H4.27L5.21,4H20A1,1 0 0,1 21,5C21,5.17 20.95,5.34 20.88,5.5L17.3,11.97C16.96,12.58 16.3,13 15.55,13H8.1L7.2,14.63L7.17,14.75A0.25,0.25 0 0,0 7.42,15H19V17H7C5.89,17 5,16.1 5,15C5,14.65 5.09,14.32 5.24,14.04L6.6,11.59L3,4H1V2M7,18A2,2 0 0,1 9,20A2,2 0 0,1 7,22C5.89,22 5,21.1 5,20C5,18.89 5.89,18 7,18M16,11L18.78,6H6.14L8.5,11H16Z"/>
+                  <svg
+                    width="32"
+                    height="32"
+                    viewBox="0 0 24 24"
+                    fill="currentColor">
+                    <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
                   </svg>
                 </div>
                 <h3>Saved Analyses</h3>
                 <p>Access your previously analyzed screw data and results</p>
-                <button onClick={handleViewSaved} className="action-btn secondary-btn">
+                <button
+                  onClick={handleViewSaved}
+                  className="action-btn secondary-btn">
                   View Saved
                 </button>
               </div>
@@ -94,7 +118,10 @@ function Home() {
           <div className="container">
             <div className="section-header">
               <h2 className="section-title">Screw Catalog</h2>
-              <p className="section-subtitle">Browse our comprehensive collection of screw types and specifications</p>
+              <p className="section-subtitle">
+                Browse our comprehensive collection of screw types and
+                specifications
+              </p>
             </div>
 
             {screws && screws.length > 0 ? (
@@ -103,8 +130,7 @@ function Home() {
                   <div
                     key={screw._id}
                     className="screw-card"
-                    onClick={() => setSelectedScrew(screw._id)}
-                  >
+                    onClick={() => setSelectedScrew(screw._id)}>
                     <div className="card-header">
                       <div className="screw-image">
                         <img
@@ -117,11 +143,11 @@ function Home() {
                       </div>
                       <div className="screw-badge">{screw.category}</div>
                     </div>
-                    
+
                     <div className="card-body">
                       <h3 className="screw-name">{screw.name}</h3>
                       <p className="screw-material">{screw.material}</p>
-                      
+
                       <div className="screw-specs">
                         <div className="spec-item">
                           <span className="spec-label">Sizes:</span>
@@ -153,9 +179,7 @@ function Home() {
                       {screw.price && (
                         <div className="screw-price">${screw.price}</div>
                       )}
-                      <button className="view-details-btn">
-                        View Details
-                      </button>
+                      <button className="view-details-btn">View Details</button>
                     </div>
                   </div>
                 ))}
@@ -163,13 +187,22 @@ function Home() {
             ) : (
               <div className="empty-state">
                 <div className="empty-icon">
-                  <svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M12,10.5A1.5,1.5 0 0,1 13.5,12A1.5,1.5 0 0,1 12,13.5A1.5,1.5 0 0,1 10.5,12A1.5,1.5 0 0,1 12,10.5M7.5,10.5A1.5,1.5 0 0,1 9,12A1.5,1.5 0 0,1 7.5,13.5A1.5,1.5 0 0,1 6,12A1.5,1.5 0 0,1 7.5,10.5M16.5,10.5A1.5,1.5 0 0,1 18,12A1.5,1.5 0 0,1 16.5,13.5A1.5,1.5 0 0,1 15,12A1.5,1.5 0 0,1 16.5,10.5Z"/>
+                  <svg
+                    width="64"
+                    height="64"
+                    viewBox="0 0 24 24"
+                    fill="currentColor">
+                    <path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M12,10.5A1.5,1.5 0 0,1 13.5,12A1.5,1.5 0 0,1 12,13.5A1.5,1.5 0 0,1 10.5,12A1.5,1.5 0 0,1 12,10.5M7.5,10.5A1.5,1.5 0 0,1 9,12A1.5,1.5 0 0,1 7.5,13.5A1.5,1.5 0 0,1 6,12A1.5,1.5 0 0,1 7.5,10.5M16.5,10.5A1.5,1.5 0 0,1 18,12A1.5,1.5 0 0,1 16.5,13.5A1.5,1.5 0 0,1 15,12A1.5,1.5 0 0,1 16.5,10.5Z" />
                   </svg>
                 </div>
                 <h3>No Screws Found</h3>
-                <p>Try adjusting your search criteria or browse different categories</p>
-                <button className="reset-search-btn" onClick={() => cbFilter("")}>
+                <p>
+                  Try adjusting your search criteria or browse different
+                  categories
+                </p>
+                <button
+                  className="reset-search-btn"
+                  onClick={() => cbFilter("")}>
                   Reset Search
                 </button>
               </div>

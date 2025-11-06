@@ -19,7 +19,6 @@ import Dashboard from "./pages/user/Dashboard.jsx";
 import AdminDashboard from "./pages/admin/Dashboard.jsx";
 import "./index.css";
 import UserManagement from "./pages/admin/UserManagement.jsx";
-import RecentAnalyses from "./pages/user/RecentAnalysis.jsx";
 
 function App() {
   return (
@@ -49,13 +48,6 @@ function App() {
             element={
               <PrivateRoute redirectedTo={"/login"}>
                 <SavedAnalyses></SavedAnalyses>
-              </PrivateRoute>
-            }></Route>
-             <Route
-            path="/recent-analysis"
-            element={
-              <PrivateRoute redirectedTo={"/login"}>
-                <RecentAnalyses></RecentAnalyses>
               </PrivateRoute>
             }></Route>
           <Route
