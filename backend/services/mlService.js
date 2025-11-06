@@ -32,7 +32,7 @@ const classify = async (request) => {
   );
 
   const toFetchDocument = screwData.data.predicted_classes[0];
-  if(!toFetchDocument) throw new Error("failed to classify the object")
+  if (!toFetchDocument) throw new Error("failed to classify the object");
   console.log("here ", toFetchDocument);
 
   const screwDocument = await Screw.find({
@@ -83,8 +83,8 @@ const count = async (request) => {
     uploadedImage: {
       url: upload.url,
       public_id: upload.public_id,
-      count:objectCount
     },
+    count: objectCount,
   });
 
   fs.unlink(request.file.path, () => {});
