@@ -12,7 +12,7 @@ import Register from "./pages/auth/register";
 import UploadPage from "./pages/user/UploadPage";
 import PrivateRoute from "./PrivateRoute";
 import Home from "./pages/user/Home";
-import SavedAnalyses from "./pages/user/SavedAnalysesPage.jsx";
+import Analyses from "./pages/user/AnalysesPage.jsx";
 import Profile from "./pages/user/Profle";
 import RecoveryPassword from "./pages/auth/RecoveryPassword.jsx";
 import Dashboard from "./pages/user/Dashboard.jsx";
@@ -47,7 +47,7 @@ function App() {
             path="/save-analyses"
             element={
               <PrivateRoute redirectedTo={"/login"}>
-                <SavedAnalyses></SavedAnalyses>
+                <Analyses></Analyses>
               </PrivateRoute>
             }></Route>
           <Route

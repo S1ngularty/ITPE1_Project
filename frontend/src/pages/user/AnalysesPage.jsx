@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "../../styles/user/pages/SaveAnalysesPage.css";
+import "../../styles/user/pages/AnalysesPage.css";
 import { getToken } from "../../utils/authUtil";
 import axios from "axios";
 import NamingModal from "../../components/user/Modal";
@@ -11,6 +11,8 @@ import ConfirmationModal from "../../components/user/ConfirmationModal";
 function SavedAnalyses() {
   const navigate = useNavigate();
   const [analyses, setAnalyses] = useState([]);
+  const [filteredAnalyses, setFilteredAnalyses] = useState([]);
+  const [activeFilter, setActiveFilter] = useState("all"); // "all", "saved", "recent"
   const [expandedId, setExpandedId] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
@@ -24,8 +26,13 @@ function SavedAnalyses() {
     fetchSavedAnalyses();
   }, []);
 
+  useEffect(() => {
+    // Filter analyses based on active filter
+    filterAnalyses();
+  }, [analyses, activeFilter]);
+
   const fetchSavedAnalyses = async () => {
-    axios(`${import.meta.env.VITE_APP_API}api/v1/savedAnalysis`, {
+    axios(`${import.meta.env.VITE_APP_API}api/v1/getRecentAnalysis?limit=0`, {
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },
@@ -35,6 +42,26 @@ function SavedAnalyses() {
         console.log(response.data.result);
       })
       .catch((error) => console.log(error));
+  };
+
+  const filterAnalyses = () => {
+    switch (activeFilter) {
+      case "saved":
+        setFilteredAnalyses(
+          analyses.filter((item) => item.saveStatus === true)
+        );
+        break;
+      case "recent":
+        // Assuming recent means analyses from the last 7 days
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+        setFilteredAnalyses(
+          analyses.filter((item) => new Date(item.createdAt) > oneWeekAgo)
+        );
+        break;
+      default:
+        setFilteredAnalyses(analyses);
+    }
   };
 
   const toggleAccordion = (id) => {
@@ -61,13 +88,26 @@ function SavedAnalyses() {
   }
 
   function actionDelete(id) {
-    // console.log(id);
     setCurrData({
       ...currData,
       id: id,
     });
     setDeleteModal(true);
     return;
+  }
+
+  function actionDownload(id) {
+    // You can handle the download logic here
+    console.log("Download analysis with ID:", id);
+    // Example download implementation:
+    // const analysis = analyses.find(item => item._id === id);
+    // if (analysis) {
+    //   // Your download logic here
+    //   notify("success", "Download started");
+    // }
+
+    // For now, just show a notification
+    notify("info", "Download functionality to be implemented");
   }
 
   async function onsubmitHandler(result) {
@@ -104,7 +144,7 @@ function SavedAnalyses() {
     <div className="saved-page">
       {deleteModal && (
         <ConfirmationModal
-          mode ={"delete"}
+          mode={"delete"}
           show={true}
           onClose={() => setDeleteModal(false)}
           onConfirm={deleteRecord}
@@ -120,12 +160,40 @@ function SavedAnalyses() {
       )}
       <Navbar />
       <main className="saved-main">
-        <h1>Your Saved Analyses</h1>
-        {analyses.length === 0 ? (
-          <p className="empty-msg">No saved analyses yet.</p>
+        <div className="page-header">
+          <h1>Your Analyses</h1>
+          <div className="filter-tabs">
+            <button
+              className={`filter-tab ${activeFilter === "all" ? "active" : ""}`}
+              onClick={() => setActiveFilter("all")}>
+              All Analyses
+            </button>
+            <button
+              className={`filter-tab ${
+                activeFilter === "saved" ? "active" : ""
+              }`}
+              onClick={() => setActiveFilter("saved")}>
+              Saved
+            </button>
+            <button
+              className={`filter-tab ${
+                activeFilter === "recent" ? "active" : ""
+              }`}
+              onClick={() => setActiveFilter("recent")}>
+              Recent
+            </button>
+          </div>
+        </div>
+
+        {filteredAnalyses.length === 0 ? (
+          <p className="empty-msg">
+            {activeFilter === "all"
+              ? "No analyses yet."
+              : `No ${activeFilter} analyses.`}
+          </p>
         ) : (
           <div className="accordion-container">
-            {analyses.map((item) => (
+            {filteredAnalyses.map((item) => (
               <div
                 key={item._id}
                 className={`accordion-item ${
@@ -141,7 +209,8 @@ function SavedAnalyses() {
                     <div className="header-info">
                       <h3>{item.name || "Unknown analysis"}</h3>
                       <p className="date">
-                        Saved on {formatDate(item.createdAt)}
+                        {item.isSaved ? "Saved" : "Created"} on{" "}
+                        {formatDate(item.createdAt)}
                       </p>
                     </div>
                   </div>
@@ -149,19 +218,28 @@ function SavedAnalyses() {
                     <span className="service-badge">{item.typeOfService}</span>
                     <span className="action-btn">
                       <li
+                        className="fa fa-download"
+                        onClick={(e) => actionDownload(item._id)}
+                        title="Download Analysis"></li>
+                    </span>
+                    <span className="action-btn">
+                      <li
                         className="fa fa-edit"
-                        onClick={(e) => actionEdit(item._id, item.name)}></li>
+                        onClick={(e) => actionEdit(item._id, item.name)}
+                        title="Edit Analysis"></li>
                     </span>
                     <span className="action-btn">
                       <li
                         className="fa fa-trash"
-                        onClick={(e) => actionDelete(item._id)}></li>
+                        onClick={(e) => actionDelete(item._id)}
+                        title="Delete Analysis"></li>
                     </span>
                     <span
                       className={`chevron ${
                         expandedId === item._id ? "rotate" : ""
                       }`}
-                      onClick={() => toggleAccordion(item._id)}>
+                      onClick={() => toggleAccordion(item._id)}
+                      title={expandedId === item._id ? "Collapse" : "Expand"}>
                       ▼
                     </span>
                   </div>
@@ -255,6 +333,10 @@ function SavedAnalyses() {
                                 <span className="value">
                                   Screw Count Analysis
                                 </span>
+                              </div>
+                              <div className="detail-row">
+                                <span className="label">Counted Object</span>
+                                <span className="value">{item.count || 0}</span>
                               </div>
                               <div className="detail-row">
                                 <span className="label">Analysis Date:</span>

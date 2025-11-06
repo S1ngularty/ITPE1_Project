@@ -237,3 +237,93 @@
     grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
   }
 }
+
+/* Add these styles to your existing CSS file */
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.filter-tabs {
+  display: flex;
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.filter-tab {
+  padding: 0.5rem 1rem;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #666;
+  transition: all 0.2s ease;
+}
+
+.filter-tab:hover {
+  background: #e9ecef;
+  color: #333;
+}
+
+.filter-tab.active {
+  background: #007bff;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.action-btn {
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+  background: #f8f9fa;
+  transform: scale(1.1);
+}
+
+.action-btn li {
+  color: #666;
+  font-size: 1rem;
+}
+
+.action-btn:hover li {
+  color: #007bff;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .filter-tabs {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .header-right {
+    gap: 0.5rem;
+  }
+  
+  .action-btn li {
+    font-size: 0.9rem;
+  }
+}
