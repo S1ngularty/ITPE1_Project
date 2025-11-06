@@ -18,7 +18,7 @@ const UploadAnalysisSchema = new mongoose.Schema(
     },
     count: {
       type: Number,
-      default: null,
+      default: 0,
     },
     typeOfService: {
       type: String,

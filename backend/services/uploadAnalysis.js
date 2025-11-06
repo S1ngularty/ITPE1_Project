@@ -161,7 +161,7 @@ const unsavedAnalyses = async (request) => {
 
 const downloadAnalysis = async (request, download) => {
   const { result, storeRecent, mode } = request.body;
-  console.log(request.body);
+  console.log(mode);
 
   const doc = new PDFDocument({
     margin: 50,
@@ -271,12 +271,14 @@ const downloadAnalysis = async (request, download) => {
     .moveDown(0.3);
 
   const imageUrl = storeRecent.uploadedImage?.url;
+  console.log(imageUrl)
   if (imageUrl) {
     try {
       // Download the image temporarily
       const response = await axios.get(imageUrl, {
         responseType: "arraybuffer",
       });
+      // console.log(response.data)
       const tempImg = `./uploads/temp-image-${Date.now()}.jpg`;
       fs.writeFileSync(tempImg, Buffer.from(response.data));
 
@@ -330,6 +332,7 @@ const downloadAnalysis = async (request, download) => {
       .text("Strength:", 60, detailsY + 75)
       .text("Sizes:", 60, detailsY + 95);
 
+      // console.log("result stage",result)
     doc
       .fillColor(darkGray)
       .font("Helvetica")
@@ -391,7 +394,7 @@ const downloadAnalysis = async (request, download) => {
       .fillColor(primaryColor)
       .fontSize(24)
       .font("Helvetica-Bold")
-      .text(result.count || "0 screws detected", 0, countY + 30, {
+      .text(storeRecent.count || "0 screws detected", 0, countY + 30, {
         align: "center",
         width: doc.page.width,
       });
@@ -402,7 +405,7 @@ const downloadAnalysis = async (request, download) => {
       .fontSize(12)
       .font("Helvetica")
       .text(
-        `Analysis Type: ${result.type || "Screw Counting"}`,
+        `Analysis Type: ${"Screw Counting"}`,
         0,
         countY + 70,
         {
@@ -474,11 +477,13 @@ const downloadAnalysis = async (request, download) => {
   doc.end();
 
   writeStream.on("finish", () => {
+    // console.log("downloading.....",filename,filePath)
     download(filePath, filename);
   });
 
   writeStream.on("error", (error) => {
     console.error("Error generating PDF:", error);
+    throw new Error("failed to write the file")
   });
 };
 
@@ -487,7 +492,7 @@ const RecentAnalysis = async (request) => {
   const recent = await UploadAnalysis.find({ user: request.user.userId })
     .limit(limit || 0).populate("screw user")
     .sort({ createdAt: -1 });
-  console.log(recent);
+  // console.log(recent);
   return recent;
 };
 

@@ -96,18 +96,35 @@ function SavedAnalyses() {
     return;
   }
 
-  function actionDownload(id) {
-    // You can handle the download logic here
-    console.log("Download analysis with ID:", id);
-    // Example download implementation:
-    // const analysis = analyses.find(item => item._id === id);
-    // if (analysis) {
-    //   // Your download logic here
-    //   notify("success", "Download started");
-    // }
+  async function actionDownload(index) {
+    const payload = {
+      result: filteredAnalyses[index].screw || filteredAnalyses[index].count,
+      storeRecent: filteredAnalyses[index],
+      mode:
+        filteredAnalyses[index].typeOfService === "classification"
+          ? "classify"
+          : "count",
+    };
+    console.log(payload);
+    const response = await fetch(
+      `${import.meta.env.VITE_APP_API}api/v1/download-report`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${getToken()}`,
+        },
+        body: JSON.stringify(payload),
+      }
+    );
 
-    // For now, just show a notification
-    notify("info", "Download functionality to be implemented");
+    if (!response.ok) notify("something went wrong, Please try again later");
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${filteredAnalyses[index].name}.pdf`;
+    a.click();
   }
 
   async function onsubmitHandler(result) {
@@ -193,7 +210,7 @@ function SavedAnalyses() {
           </p>
         ) : (
           <div className="accordion-container">
-            {filteredAnalyses.map((item) => (
+            {filteredAnalyses.map((item, index) => (
               <div
                 key={item._id}
                 className={`accordion-item ${
@@ -219,7 +236,7 @@ function SavedAnalyses() {
                     <span className="action-btn">
                       <li
                         className="fa fa-download"
-                        onClick={(e) => actionDownload(item._id)}
+                        onClick={(e) => actionDownload(index)}
                         title="Download Analysis"></li>
                     </span>
                     <span className="action-btn">
