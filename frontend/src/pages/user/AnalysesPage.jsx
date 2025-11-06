@@ -228,12 +228,14 @@ function SavedAnalyses() {
                         onClick={(e) => actionEdit(item._id, item.name)}
                         title="Edit Analysis"></li>
                     </span>
-                    <span className="action-btn">
-                      <li
-                        className="fa fa-trash"
-                        onClick={(e) => actionDelete(item._id)}
-                        title="Delete Analysis"></li>
-                    </span>
+                    {item.saveStatus === true && (
+                      <span className="action-btn">
+                        <li
+                          className="fa fa-trash"
+                          onClick={(e) => actionDelete(item._id)}
+                          title="Delete Analysis"></li>
+                      </span>
+                    )}
                     <span
                       className={`chevron ${
                         expandedId === item._id ? "rotate" : ""
