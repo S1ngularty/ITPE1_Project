@@ -35,3 +35,9 @@ const secret = process.env.JWT_SECRET;
 
   next();
 };
+
+exports.checkRole =async(req,res,next)=>{
+  if(role!== req.user.role) return res.status(403).json(`cant access this resource by ${role}`)
+
+
+}
