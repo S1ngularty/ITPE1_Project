@@ -1,4 +1,5 @@
 const UploadAnalysis = require("../models/uploadAnalysis");
+const User = require("../models/user")
 const { uploadToCloudinary, singleImage } = require("../utils/cloudinary");
 const mongoose = require("mongoose");
 const PDFDocument = require("pdfkit");
@@ -46,7 +47,7 @@ const dashboardInfo = async (user) => {
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
 
-  const [history, requestUsage, graphData] = await Promise.all([
+  const [history, requestUsage, graphData,userCount] = await Promise.all([
     UploadAnalysis.find({ user: user.userId }).exec(),
     UploadAnalysis.countDocuments({
       user: user.userId,
@@ -85,6 +86,7 @@ const dashboardInfo = async (user) => {
       },
       { $sort: { "_id.year": 1, "_id.month": 1 } },
     ]),
+    User.find().countDocuments().exec()
   ]);
 
   // console.log(graphData);
@@ -132,8 +134,7 @@ const dashboardInfo = async (user) => {
     }
     notSave.push(activity);
   }
-
-  return { activity: { isSave, notSave }, requestUsage, graphDataUsage };
+  return { activity: { isSave, notSave }, requestUsage, graphDataUsage, requestLimit:(Math.floor(2000/userCount)) };
 };
 
 const editSaveAnalyses = async (request) => {

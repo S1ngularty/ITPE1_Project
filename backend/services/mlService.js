@@ -1,4 +1,5 @@
 const Screw = require("../models/screw");
+const User = require("../models/user");
 const UploadAnalysis = require("../models/uploadAnalysis");
 const multer = require("multer");
 const fs = require("fs");
@@ -10,8 +11,23 @@ const { singleImage } = require("../utils/cloudinary");
 
 const upload = multer({ dest: "tmp_uploads/" });
 
+// async function userLimit(user) {
+//   const userCount = await User.find().countDocuments().exec();
+//   const userRequest = await User.find({
+//     user: user.userId,
+//   }).countDocuments.exec();
+//   const requestLimit = Math.floor(2000 / userCount);
+//     console.log(userCount,userRequest,requestLimit)
+
+//   if (userRequest >= requestLimit) return false;
+//   return true;
+// }
+
 const classify = async (request) => {
   if (!request.file) throw new Error("no file uploaded");
+
+//  if(!await userLimit(request.user)) throw new Error("request limit has been reached")
+
   const formData = new FormData();
   formData.append("file", fs.createReadStream(request.file.path));
   const imageBase64 = fs.readFileSync(request.file.path, {
@@ -62,6 +78,8 @@ const classify = async (request) => {
 const count = async (request) => {
   const puter = init(process.env.PUTER_AUTH_TOKEN);
 
+  //  if(!await userLimit(request.user)) throw new Error("request limit has been reached")
+
   if (!request.file) throw new Error("No uploaded file");
 
   const upload = await singleImage(request.file);
@@ -69,7 +87,7 @@ const count = async (request) => {
   console.log(imageUrl);
   // Use GPT model to count objects using the image URL
   const objectCountResponse = await puter.ai.chat(
-    `Count the screws in this image precisely and only return a number`,
+    `Analyze this image thoroughly, now i want you to count all the fasteners. check the color pixel for each fasteners to make it distinct to other fasteners and to be more accurate. return a number of fasteners only.`,
     imageUrl,
     { model: "gpt-5-nano" }
   );

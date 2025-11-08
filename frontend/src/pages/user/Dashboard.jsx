@@ -7,6 +7,7 @@ import Chart from "../../components/user/Chart";
 const Dashboard = () => {
   const [userData, setUserData] = useState(null);
   const [graphData, setGraphData]= useState([])
+  const [reqLimit,setReqLimit]= useState(0)
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -50,7 +51,7 @@ const Dashboard = () => {
   };
 
   const transformApiData = (result) => {
-    const { activity, requestUsage, graphDataUsage } = result;
+    const { activity, requestUsage, graphDataUsage, requestLimit } = result;
     setGraphData(graphDataUsage)
     const allActivities = [...activity.isSave, ...activity.notSave];
 
@@ -106,7 +107,6 @@ const Dashboard = () => {
     }));
 
     // Request usage calculation (assuming limit of 100)
-    const requestLimit = 100;
     const percentage = Math.round((requestUsage / requestLimit) * 100);
 
     return {
