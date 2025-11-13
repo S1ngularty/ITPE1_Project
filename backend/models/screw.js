@@ -9,12 +9,14 @@ const screwSchema = new mongoose.Schema({
   category: {
     type: String,
     default: "Machine Screw",
-    enum: ["Wood Screw", "Machine Screw", "Structural Fastener", "Anchor Screw"],
+    enum: [
+      "Wood Screw",
+      "Machine Screw",
+      "Structural Fastener",
+      "Anchor Screw",
+    ],
   },
-  sizes: {
-    type: [Number],
-    required: true,
-  },
+  sizes: [{ type: String }], // General available sizes
   material: {
     type: String,
     required: true,
@@ -22,6 +24,10 @@ const screwSchema = new mongoose.Schema({
   driverType: {
     type: String,
     default: "Phillips",
+  },
+  tool: {
+    type: String,
+    default: "Phillips screwdriver", // tool to drive the screw
   },
   threadedType: {
     type: String,
@@ -39,6 +45,11 @@ const screwSchema = new mongoose.Schema({
     type: String,
     default: "1.25 mm",
   },
+  threadDetails: {
+    pitch: { type: String },
+    rotation: { type: String, default: "Right-hand" },
+    availableSizes: [{ type: String }],
+  },
   coating: {
     type: String,
     default: "Zinc Plated",
@@ -54,6 +65,11 @@ const screwSchema = new mongoose.Schema({
   corrosionResistance: {
     type: String,
     default: "Medium",
+  },
+  torque: {
+    maxTorqueNm: { type: Number },
+    recommendedTorqueNm: { type: Number },
+    recommendedTightness: { type: String }, // New: recommended tightness after scan
   },
   description: {
     type: String,

@@ -107,9 +107,88 @@ const ScrewPreviewModal = ({ id, onClose }) => {
     }
   };
 
-  // Fallback content if data is missing
-  const getDisplayText = (text, fallback = "Not specified") => {
-    return text || fallback;
+  // Helper function to conditionally render fields
+  const renderField = (label, value, fallback = "Not specified") => {
+    if (!value && value !== 0) return null;
+    
+    return (
+      <div className="spec-item">
+        <span className="spec-label">{label}:</span>
+        <span className="spec-value">{value || fallback}</span>
+      </div>
+    );
+  };
+
+  // Helper function to render array fields
+  const renderArrayField = (label, array, fallback = "Not specified") => {
+    if (!array || !Array.isArray(array) || array.length === 0) return null;
+    
+    return (
+      <div className="spec-item full-width">
+        <span className="spec-label">{label}:</span>
+        <span className="spec-value">{array.join(", ")}</span>
+      </div>
+    );
+  };
+
+  // Helper function to render torque fields
+  const renderTorqueField = () => {
+    if (!screw.torque) return null;
+
+    const { maxTorqueNm, recommendedTorqueNm, recommendedTightness } = screw.torque;
+    
+    if (!maxTorqueNm && !recommendedTorqueNm && !recommendedTightness) return null;
+
+    return (
+      <div className="torque-section">
+        <h4 className="subsection-title">Torque Specifications</h4>
+        <div className="subsection-content">
+          {maxTorqueNm && (
+            <div className="spec-item">
+              <span className="spec-label">Max Torque:</span>
+              <span className="spec-value">{maxTorqueNm} Nm</span>
+            </div>
+          )}
+          {recommendedTorqueNm && (
+            <div className="spec-item">
+              <span className="spec-label">Recommended Torque:</span>
+              <span className="spec-value">{recommendedTorqueNm} Nm</span>
+            </div>
+          )}
+          {recommendedTightness && (
+            <div className="spec-item">
+              <span className="spec-label">Recommended Tightness:</span>
+              <span className="spec-value">{recommendedTightness}</span>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  // Helper function to render thread details
+  const renderThreadDetails = () => {
+    if (!screw.threadDetails) return null;
+
+    const { pitch, rotation, availableSizes } = screw.threadDetails;
+    
+    if (!pitch && !rotation && (!availableSizes || availableSizes.length === 0)) return null;
+
+    return (
+      <div className="thread-details-section">
+        <h4 className="subsection-title">Thread Details</h4>
+        <div className="subsection-content">
+          {renderField("Thread Pitch", pitch)}
+          {renderField("Thread Rotation", rotation)}
+          {renderArrayField("Available Thread Sizes", availableSizes)}
+        </div>
+      </div>
+    );
+  };
+
+  // Helper function to check if field has non-default value
+  const hasNonDefaultValue = (value, defaultValue) => {
+    return value && value !== defaultValue;
   };
 
   if (loading) {
@@ -209,41 +288,52 @@ const ScrewPreviewModal = ({ id, onClose }) => {
         {/* Product information */}
         <div className="screwdetails-info">
           <div className="product-header">
-            <h1 className="screwdetails-name">{getDisplayText(screw.name)}</h1>
-            <p className="screwdetails-category">
-              {getDisplayText(screw.category)}
-            </p>
+            <h1 className="screwdetails-name">
+              {screw.name || "Unnamed Screw"}
+            </h1>
+            {screw.category && (
+              <p className="screwdetails-category">{screw.category}</p>
+            )}
           </div>
 
+          {/* Main Specifications Grid */}
           <div className="specs-grid">
-            <div className="spec-item">
-              <span className="spec-label">Material:</span>
-              <span className="spec-value">
-                {getDisplayText(screw.material)}
-              </span>
-            </div>
-            <div className="spec-item">
-              <span className="spec-label">Strength:</span>
-              <span className="spec-value">
-                {getDisplayText(screw.strength)}
-              </span>
-            </div>
-            <div className="spec-item full-width">
-              <span className="spec-label">Available Sizes:</span>
-              <span className="spec-value">
-                {screw.sizes && screw.sizes.length > 0
-                  ? screw.sizes.join(", ")
-                  : "Not specified"}
-              </span>
-            </div>
+            {renderField("Material", screw.material)}
+            {renderField("Driver Type", screw.driverType)}
+            {hasNonDefaultValue(screw.tool, "Phillips screwdriver") && 
+              renderField("Tool", screw.tool)
+            }
+            {renderField("Threaded Type", screw.threadedType)}
+            {renderField("Strength", screw.strength)}
+            {renderField("Head Type", screw.headType)}
+            {renderField("Thread Pitch", screw.threadPitch)}
+            {renderField("Coating", screw.coating)}
+            {renderField("Drive Size", screw.driveSize)}
+            {renderField("Corrosion Resistance", screw.corrosionResistance)}
+            {renderArrayField("Available Sizes", screw.sizes)}
           </div>
 
-          <div className="screwdetails-section">
-            <h3 className="section-title">Description</h3>
-            <p className="section-content">
-              {getDisplayText(screw.description, "No description available.")}
-            </p>
-          </div>
+          {/* Thread Details Section */}
+          {renderThreadDetails()}
+
+          {/* Torque Specifications Section */}
+          {renderTorqueField()}
+
+          {/* Application Section */}
+          {hasNonDefaultValue(screw.application, "General fastening applications") && (
+            <div className="screwdetails-section">
+              <h3 className="section-title">Application</h3>
+              <p className="section-content">{screw.application}</p>
+            </div>
+          )}
+
+          {/* Description Section */}
+          {screw.description && (
+            <div className="screwdetails-section">
+              <h3 className="section-title">Description</h3>
+              <p className="section-content">{screw.description}</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

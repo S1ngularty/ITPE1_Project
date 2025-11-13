@@ -25,6 +25,7 @@ function Home() {
     navigate("../save-analyses");
   }
 
+  console.log(screws)
   return (
     <div className="home-page">
       <Navbar searchKeyword={search} applyResult={cbFilter} />
@@ -152,12 +153,12 @@ function Home() {
                         <div className="spec-item">
                           <span className="spec-label">Sizes:</span>
                           <div className="size-tags">
-                            {screw.sizes.slice(0, 3).map((size, index) => (
+                            {screw.sizes && screw.sizes.slice(0, 3).map((size, index) => (
                               <span key={index} className="size-tag">
                                 {size}
                               </span>
                             ))}
-                            {screw.sizes.length > 3 && (
+                            {screw.sizes && screw.sizes.length > 3 && (
                               <span className="size-tag-more">
                                 +{screw.sizes.length - 3}
                               </span>
