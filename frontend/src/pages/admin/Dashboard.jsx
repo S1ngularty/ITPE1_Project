@@ -27,88 +27,17 @@ const AdminDashboard = () => {
     const fetchAdminData = async () => {
       try {
         // Replace with actual API call
-        setTimeout(() => {
-          setAdminData({
-            storageUsage: {
-              cloudinary: {
-                used: 45,
-                usedGB: 4.5,
-                totalGB: 10,
-                files: 1247,
-              },
-              roboflow: {
-                used: 28,
-                usedGB: 2.8,
-                totalGB: 10,
-                datasets: 12,
-                models: 8,
-              },
+        const response = await fetch(
+          `${import.meta.env.VITE_APP_API}api/v1/admin/dashboardy`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
-            requestUsage: [
-              {
-                date: "2024-01-01",
-                count: 45,
-                classification: 30,
-                detection: 15,
-              },
-              {
-                date: "2024-01-02",
-                count: 52,
-                classification: 35,
-                detection: 17,
-              },
-              {
-                date: "2024-01-03",
-                count: 38,
-                classification: 25,
-                detection: 13,
-              },
-              {
-                date: "2024-01-04",
-                count: 61,
-                classification: 42,
-                detection: 19,
-              },
-              {
-                date: "2024-01-05",
-                count: 55,
-                classification: 38,
-                detection: 17,
-              },
-              {
-                date: "2024-01-06",
-                count: 48,
-                classification: 32,
-                detection: 16,
-              },
-              {
-                date: "2024-01-07",
-                count: 67,
-                classification: 45,
-                detection: 22,
-              },
-            ],
-            userActivities: [
-              { type: "Image Upload", count: 234 },
-              { type: "Screw Detection", count: 189 },
-              { type: "Classification", count: 156 },
-              { type: "Results Saved", count: 98 },
-              { type: "Results Shared", count: 45 },
-            ],
-            userStats: {
-              totalUsers: 1247,
-              activeUsers: 892,
-              newUsers: 67,
-              premiumUsers: 234,
-            },
-            systemMetrics: {
-              uptime: 99.8,
-              responseTime: 124,
-              errorRate: 0.2,
-            },
-          });
-          setLoading(false);
-        }, 1000);
+          }
+        );
+        const data = await response.json();
+        setAdminData(data.result);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching admin data:", error);
         setLoading(false);
@@ -119,6 +48,122 @@ const AdminDashboard = () => {
   }, [timeRange]);
 
   const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
+
+  // Format Cloudinary storage data with max 100%
+  const formatCloudinaryStorage = (cloudinaryData) => {
+    if (!cloudinaryData) return { used: 0, usedGB: 0, totalGB: 25, files: 0 };
+
+    const storageBytes = cloudinaryData.storage?.usage || 0;
+    const usedGB = (storageBytes / 1024 ** 3).toFixed(2); // bytes → GB
+    const totalGB = 25; // free plan limit
+    const usedPercentage = Math.min((usedGB / totalGB) * 100, 100).toFixed(1); // Cap at 100%
+
+    return {
+      used: parseFloat(usedPercentage),
+      usedGB: parseFloat(usedGB),
+      totalGB,
+      files: cloudinaryData.resources || 0,
+    };
+  };
+
+  // Format Roboflow usage data with max 100%
+  const formatRoboflowUsage = (roboflowData) => {
+    if (!roboflowData)
+      return { used: 0, datasets: 0, imagesLabeled: 0, boxesDrawn: 0 };
+
+    const imagesLabeled = roboflowData.stats?.numImagesLabeled || 0;
+    const boxesDrawn = roboflowData.stats?.numBoxesDrawn || 0;
+    const datasets = roboflowData.data?.length || 0;
+
+    // Cap usage percentage at 100%
+    const usedPercentage = Math.min((imagesLabeled / 1000) * 100, 100).toFixed(
+      1
+    );
+
+    return {
+      used: parseFloat(usedPercentage),
+      datasets: datasets,
+      imagesLabeled: imagesLabeled,
+      boxesDrawn: boxesDrawn,
+      projects: roboflowData.data || [],
+    };
+  };
+
+  // Format request usage data for chart
+  const formatRequestUsage = (requestData) => {
+    if (!requestData || !Array.isArray(requestData)) return [];
+
+    return requestData.map((item) => ({
+      month: getMonthName(item.month),
+      classification: item.classificationCount,
+      count: item.countCount,
+      total: item.classificationCount + item.countCount,
+      year: item.year,
+    }));
+  };
+
+  // Format user growth data for chart with proper Y-axis domain
+  const formatUserGrowth = (userGrowthData) => {
+    if (!userGrowthData || !Array.isArray(userGrowthData)) return [];
+
+    return userGrowthData.map((item) => ({
+      month: getMonthName(item.month),
+      users: item.userCount,
+      year: item.year,
+    }));
+  };
+
+  // Calculate max value for user growth Y-axis (1.5x highest data point)
+  const getUserGrowthYAxisDomain = (userGrowthData) => {
+    if (!userGrowthData || userGrowthData.length === 0) return [0, 10];
+
+    const maxUsers = Math.max(...userGrowthData.map((item) => item.users));
+    const maxDomain = Math.ceil(maxUsers * 1.5); // 1.5x the highest value, rounded up
+    return [0, maxDomain];
+  };
+
+  // Calculate max value for request usage Y-axis (1.5x highest data point)
+  const getRequestUsageYAxisDomain = (requestUsageData) => {
+    if (!requestUsageData || requestUsageData.length === 0) return [0, 10];
+
+    const maxRequests = Math.max(...requestUsageData.map((item) => item.total));
+    const maxDomain = Math.ceil(maxRequests * 1.5); // 1.5x the highest value, rounded up
+    return [0, maxDomain];
+  };
+
+  // Helper function to get month name
+  const getMonthName = (monthNumber) => {
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    return months[monthNumber - 1] || `Month ${monthNumber}`;
+  };
+
+  // Calculate Cloudinary credits usage with max 100%
+  const getCloudinaryCreditsUsage = (cloudinaryData) => {
+    if (!cloudinaryData) return { used: 0, limit: 25, percentage: 0 };
+
+    const used = cloudinaryData.credits?.usage || 0;
+    const limit = cloudinaryData.credits?.limit || 25;
+    const percentage = Math.min((used / limit) * 100, 100).toFixed(1); // Cap at 100%
+
+    return {
+      used: used,
+      limit: limit,
+      percentage: parseFloat(percentage),
+    };
+  };
 
   if (loading) {
     return (
@@ -133,6 +178,29 @@ const AdminDashboard = () => {
       </div>
     );
   }
+
+  if (!adminData) {
+    return (
+      <div className="admin-layout">
+        <AdminSidebar />
+        <div className="admin-main-content">
+          <div className="error-container">
+            <p>Failed to load dashboard data.</p>
+            <button onClick={() => window.location.reload()}>Retry</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const cloudinaryStorage = formatCloudinaryStorage(adminData.cloudinaryUsage);
+  const roboflowUsage = formatRoboflowUsage(adminData.roboflowUsage);
+  const requestUsageData = formatRequestUsage(adminData.requestUsage);
+  const userGrowthData = formatUserGrowth(adminData.userGrowth);
+  const creditsUsage = getCloudinaryCreditsUsage(adminData.cloudinaryUsage);
+
+  const userGrowthYAxisDomain = getUserGrowthYAxisDomain(userGrowthData);
+  const requestUsageYAxisDomain = getRequestUsageYAxisDomain(requestUsageData);
 
   return (
     <div className="admin-layout">
@@ -150,243 +218,201 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          <div className="admin-dashboard-page">
-            {/* Storage Usage Cards */}
-            <div className="storage-cards-grid">
-              {/* Cloudinary Storage Card */}
-              <div className="storage-card">
-                <div className="storage-card-header">
-                  <h3>Cloudinary Storage</h3>
-                  <span className="storage-subtitle">Image Storage</span>
-                </div>
-                <div className="storage-content">
-                  <div className="circular-progress-container">
-                    <div className="circular-progress">
-                      <svg width="120" height="120" viewBox="0 0 120 120">
-                        <circle
-                          cx="60"
-                          cy="60"
-                          r="50"
-                          fill="none"
-                          stroke="#e5e7eb"
-                          strokeWidth="8"
-                        />
-                        <circle
-                          cx="60"
-                          cy="60"
-                          r="50"
-                          fill="none"
-                          stroke="#3B82F6"
-                          strokeWidth="8"
-                          strokeLinecap="round"
-                          strokeDasharray="314"
-                          strokeDashoffset={314 * (1 - 45 / 100)}
-                          transform="rotate(-90 60 60)"
-                        />
-                      </svg>
-                      <div className="progress-content">
-                        <div className="progress-percentage">45%</div>
-                        <div className="progress-label">Used</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="storage-details">
-                    <div className="storage-stat">
-                      <span className="stat-label">Storage Used</span>
-                      <span className="stat-value">4.5 GB</span>
-                    </div>
-                    <div className="storage-stat">
-                      <span className="stat-label">Total Storage</span>
-                      <span className="stat-value">10 GB</span>
-                    </div>
-                    <div className="storage-stat">
-                      <span className="stat-label">Files Stored</span>
-                      <span className="stat-value">1,247</span>
-                    </div>
-                  </div>
-                </div>
+          {/* Storage Usage Cards */}
+          <div className="storage-cards-grid">
+            {/* Cloudinary Storage Card */}
+            <div className="storage-card">
+              <div className="storage-card-header">
+                <h3>Cloudinary Storage</h3>
+                <span className="storage-subtitle">Image & Media Storage</span>
               </div>
-
-              {/* Roboflow Usage Card */}
-              <div className="storage-card">
-                <div className="storage-card-header">
-                  <h3>Roboflow Usage</h3>
-                  <span className="storage-subtitle">AI Model Services</span>
-                </div>
-                <div className="storage-content">
-                  <div className="circular-progress-container">
-                    <div className="circular-progress">
-                      <svg width="120" height="120" viewBox="0 0 120 120">
-                        <circle
-                          cx="60"
-                          cy="60"
-                          r="50"
-                          fill="none"
-                          stroke="#e5e7eb"
-                          strokeWidth="8"
-                        />
-                        <circle
-                          cx="60"
-                          cy="60"
-                          r="50"
-                          fill="none"
-                          stroke="#10B981"
-                          strokeWidth="8"
-                          strokeLinecap="round"
-                          strokeDasharray="314"
-                          strokeDashoffset={314 * (1 - 28 / 100)}
-                          transform="rotate(-90 60 60)"
-                        />
-                      </svg>
-                      <div className="progress-content">
-                        <div className="progress-percentage">28%</div>
-                        <div className="progress-label">Used</div>
+              <div className="storage-content">
+                <div className="circular-progress-container">
+                  <div className="circular-progress">
+                    <svg width="120" height="120" viewBox="0 0 120 120">
+                      <circle
+                        cx="60"
+                        cy="60"
+                        r="50"
+                        fill="none"
+                        stroke="#e5e7eb"
+                        strokeWidth="8"
+                      />
+                      <circle
+                        cx="60"
+                        cy="60"
+                        r="50"
+                        fill="none"
+                        stroke="#3B82F6"
+                        strokeWidth="8"
+                        strokeLinecap="round"
+                        strokeDasharray="314"
+                        strokeDashoffset={
+                          314 * (1 - cloudinaryStorage.used / 100)
+                        }
+                        transform="rotate(-90 60 60)"
+                      />
+                    </svg>
+                    <div className="progress-content">
+                      <div className="progress-percentage">
+                        {cloudinaryStorage.used}%
                       </div>
+                      <div className="progress-label">Used</div>
                     </div>
                   </div>
-                  <div className="storage-details">
-                    <div className="storage-stat">
-                      <span className="stat-label">API Usage</span>
-                      <span className="stat-value">2.8 GB</span>
-                    </div>
-                    <div className="storage-stat">
-                      <span className="stat-label">Total Limit</span>
-                      <span className="stat-value">10 GB</span>
-                    </div>
-                    <div className="storage-stat">
-                      <span className="stat-label">Active Datasets</span>
-                      <span className="stat-value">12</span>
-                    </div>
-                    <div className="storage-stat">
-                      <span className="stat-label">Trained Models</span>
-                      <span className="stat-value">8</span>
-                    </div>
+                </div>
+                <div className="storage-details">
+                  <div className="storage-stat">
+                    <span className="stat-label">Storage Used</span>
+                    <span className="stat-value">
+                      {cloudinaryStorage.usedGB} GB
+                    </span>
+                  </div>
+                  <div className="storage-stat">
+                    <span className="stat-label">Total Storage</span>
+                    <span className="stat-value">
+                      {cloudinaryStorage.totalGB} GB
+                    </span>
+                  </div>
+                  <div className="storage-stat">
+                    <span className="stat-label">Files Stored</span>
+                    <span className="stat-value">
+                      {cloudinaryStorage.files.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="storage-stat">
+                    <span className="stat-label">Credits Used</span>
+                    <span className="stat-value">
+                      {creditsUsage.used} / {creditsUsage.limit}
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Charts Section */}
-            <div className="charts-grid">
-              {/* Request Usage Chart */}
-              <div className="chart-card">
-                <div className="chart-header">
-                  <h3>Request Usage</h3>
-                  <span className="chart-subtitle">Daily API Requests</span>
+            {/* Roboflow Usage Card */}
+            <div className="storage-card">
+              <div className="storage-card-header">
+                <h3>Roboflow Usage</h3>
+                <span className="storage-subtitle">AI Model Services</span>
+              </div>
+              <div className="storage-content">
+                <div className="circular-progress-container">
+                  <div className="circular-progress">
+                    <svg width="120" height="120" viewBox="0 0 120 120">
+                      <circle
+                        cx="60"
+                        cy="60"
+                        r="50"
+                        fill="none"
+                        stroke="#e5e7eb"
+                        strokeWidth="8"
+                      />
+                      <circle
+                        cx="60"
+                        cy="60"
+                        r="50"
+                        fill="none"
+                        stroke="#10B981"
+                        strokeWidth="8"
+                        strokeLinecap="round"
+                        strokeDasharray="314"
+                        strokeDashoffset={314 * (1 - roboflowUsage.used / 100)}
+                        transform="rotate(-90 60 60)"
+                      />
+                    </svg>
+                    <div className="progress-content">
+                      <div className="progress-percentage">
+                        {roboflowUsage.used}%
+                      </div>
+                      <div className="progress-label">Used</div>
+                    </div>
+                  </div>
                 </div>
-                <div className="chart-container">
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart
-                      data={[
-                        {
-                          date: "Mon",
-                          total: 45,
-                          classification: 30,
-                          detection: 15,
-                        },
-                        {
-                          date: "Tue",
-                          total: 52,
-                          classification: 35,
-                          detection: 17,
-                        },
-                        {
-                          date: "Wed",
-                          total: 38,
-                          classification: 25,
-                          detection: 13,
-                        },
-                        {
-                          date: "Thu",
-                          total: 61,
-                          classification: 42,
-                          detection: 19,
-                        },
-                        {
-                          date: "Fri",
-                          total: 55,
-                          classification: 38,
-                          detection: 17,
-                        },
-                        {
-                          date: "Sat",
-                          total: 48,
-                          classification: 32,
-                          detection: 16,
-                        },
-                        {
-                          date: "Sun",
-                          total: 67,
-                          classification: 45,
-                          detection: 22,
-                        },
-                      ]}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="date" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
-                      <Bar
-                        dataKey="total"
-                        name="Total Requests"
-                        fill="#3B82F6"
-                      />
-                      <Bar
-                        dataKey="classification"
-                        name="Classification"
-                        fill="#10B981"
-                      />
-                      <Bar
-                        dataKey="detection"
-                        name="Detection"
-                        fill="#F59E0B"
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
+                <div className="storage-details">
+                  <div className="storage-stat">
+                    <span className="stat-label">Images Labeled</span>
+                    <span className="stat-value">
+                      {roboflowUsage.imagesLabeled}
+                    </span>
+                  </div>
+                  <div className="storage-stat">
+                    <span className="stat-label">Boxes Drawn</span>
+                    <span className="stat-value">
+                      {roboflowUsage.boxesDrawn}
+                    </span>
+                  </div>
+                  <div className="storage-stat">
+                    <span className="stat-label">Active Projects</span>
+                    <span className="stat-value">{roboflowUsage.datasets}</span>
+                  </div>
+                  <div className="storage-stat">
+                    <span className="stat-label">Labelers</span>
+                    <span className="stat-value">
+                      {adminData.roboflowUsage?.labelers?.length || 0}
+                    </span>
+                  </div>
                 </div>
               </div>
+            </div>
+          </div>
 
-              {/* User Growth Chart */}
-              <div className="chart-card">
-                <div className="chart-header">
-                  <h3>User Growth</h3>
-                  <span className="chart-subtitle">Monthly Progress</span>
-                </div>
-                <div className="chart-container">
-                  <ResponsiveContainer width="100%" height={300}>
-                    <LineChart
-                      data={[
-                        { month: "Jan", total: 1000, active: 750 },
-                        { month: "Feb", total: 1100, active: 820 },
-                        { month: "Mar", total: 1200, active: 890 },
-                        { month: "Apr", total: 1247, active: 892 },
-                        { month: "May", total: 1350, active: 950 },
-                        { month: "Jun", total: 1420, active: 1020 },
-                      ]}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="month" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
-                      <Line
-                        type="monotone"
-                        dataKey="total"
-                        name="Total Users"
-                        stroke="#3B82F6"
-                        strokeWidth={3}
-                        dot={{ fill: "#3B82F6", strokeWidth: 2, r: 4 }}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="active"
-                        name="Active Users"
-                        stroke="#10B981"
-                        strokeWidth={3}
-                        dot={{ fill: "#10B981", strokeWidth: 2, r: 4 }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
+          {/* Charts Section */}
+          <div className="charts-grid">
+            {/* Request Usage Chart */}
+            <div className="chart-card">
+              <div className="chart-header">
+                <h3>Request Usage</h3>
+                <span className="chart-subtitle">Monthly API Requests</span>
+              </div>
+              <div className="chart-container">
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={requestUsageData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis domain={requestUsageYAxisDomain} />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="total" name="Total Requests" fill="#3B82F6" />
+                    <Bar
+                      dataKey="classification"
+                      name="Classification"
+                      fill="#10B981"
+                    />
+                    <Bar
+                      dataKey="count"
+                      name="Count Detection"
+                      fill="#F59E0B"
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* User Growth Chart */}
+            <div className="chart-card">
+              <div className="chart-header">
+                <h3>User Growth</h3>
+                <span className="chart-subtitle">Monthly Progress</span>
+              </div>
+              <div className="chart-container">
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={userGrowthData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis domain={userGrowthYAxisDomain} />
+                    <Tooltip />
+                    <Legend />
+                    <Line
+                      type="monotone"
+                      dataKey="users"
+                      name="Total Users"
+                      stroke="#3B82F6"
+                      strokeWidth={3}
+                      dot={{ fill: "#3B82F6", strokeWidth: 2, r: 4 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
               </div>
             </div>
           </div>
