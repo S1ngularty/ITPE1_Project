@@ -15,26 +15,15 @@ const AdminSidebar = () => {
       path: "/admin/dashboard"
     },
     {
-      id: "users",
-      label: "User Management",
-      icon: "👥",
-      path: "/admin/users"
-    },
-    {
-      id: "analytics",
-      label: "Analytics",
-      icon: "📈",
-      path: "/admin/analytics",
-      subItems: [
-        { id: "usage", label: "Usage Analytics", path: "/admin/analytics/usage" },
-        { id: "performance", label: "Performance", path: "/admin/analytics/performance" }
-      ]
+      id: "feedbacks",
+      label: "Review Feedbacks",
+      icon: "💬",
+      path: "/admin/feedbacks"
     },
   ];
 
-  const isActive = (path, subItems = []) => {
-    if (location.pathname === path) return true;
-    return subItems.some(item => location.pathname === item.path);
+  const isActive = (path) => {
+    return location.pathname === path;
   };
 
   const handleNavigation = (path) => {
@@ -69,36 +58,14 @@ const AdminSidebar = () => {
           {menuItems.map((item) => (
             <li key={item.id} className="nav-item">
               <div
-                className={`nav-link ${isActive(item.path, item.subItems || []) ? 'active' : ''}`}
+                className={`nav-link ${isActive(item.path) ? 'active' : ''}`}
                 onClick={() => handleNavigation(item.path)}
               >
                 <span className="nav-icon">{item.icon}</span>
                 {!isCollapsed && (
-                  <>
-                    <span className="nav-label">{item.label}</span>
-                    {item.subItems && (
-                      <span className="nav-arrow">▼</span>
-                    )}
-                  </>
+                  <span className="nav-label">{item.label}</span>
                 )}
               </div>
-              
-              {/* Sub Items */}
-              {!isCollapsed && item.subItems && (
-                <ul className="nav-submenu">
-                  {item.subItems.map((subItem) => (
-                    <li key={subItem.id} className="nav-subitem">
-                      <div
-                        className={`nav-sublink ${location.pathname === subItem.path ? 'active' : ''}`}
-                        onClick={() => handleNavigation(subItem.path)}
-                      >
-                        <span className="nav-subicon">•</span>
-                        <span className="nav-sublabel">{subItem.label}</span>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
             </li>
           ))}
         </ul>
@@ -116,13 +83,6 @@ const AdminSidebar = () => {
           </div>
         )}
         <div className="sidebar-actions">
-          <button 
-            className="sidebar-action-btn"
-            onClick={() => navigate('/admin/profile')}
-            title="Profile"
-          >
-            👤 {!isCollapsed && <span>Profile</span>}
-          </button>
           <button 
             className="sidebar-action-btn"
             onClick={() => navigate('/')}

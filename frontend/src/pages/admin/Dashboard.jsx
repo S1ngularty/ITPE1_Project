@@ -28,7 +28,7 @@ const AdminDashboard = () => {
       try {
         // Replace with actual API call
         const response = await fetch(
-          `${import.meta.env.VITE_APP_API}api/v1/admin/dashboardy`,
+          `${import.meta.env.VITE_APP_API}api/v1/admin/dashboard`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
