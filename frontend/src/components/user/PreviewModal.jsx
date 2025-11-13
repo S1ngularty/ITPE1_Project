@@ -191,6 +191,32 @@ const ScrewPreviewModal = ({ id, onClose }) => {
     return value && value !== defaultValue;
   };
 
+  // Helper function to split description into bullet points
+  const renderDescription = (description) => {
+    if (!description) return null;
+
+    // Split by periods and filter out empty strings
+    const sentences = description
+      .split('.')
+      .map(sentence => sentence.trim())
+      .filter(sentence => sentence.length > 0);
+
+    if (sentences.length === 0) return null;
+
+    return (
+      <div className="screwdetails-section">
+        <h3 className="section-title">Description</h3>
+        <ul className="description-list">
+          {sentences.map((sentence, index) => (
+            <li key={index} className="description-item">
+              {sentence}
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div className="screwdetails-loading">
@@ -327,13 +353,8 @@ const ScrewPreviewModal = ({ id, onClose }) => {
             </div>
           )}
 
-          {/* Description Section */}
-          {screw.description && (
-            <div className="screwdetails-section">
-              <h3 className="section-title">Description</h3>
-              <p className="section-content">{screw.description}</p>
-            </div>
-          )}
+          {/* Description Section with Bullet Points */}
+          {renderDescription(screw.description)}
         </div>
       </div>
     </div>
