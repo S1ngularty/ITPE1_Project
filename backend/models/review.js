@@ -22,11 +22,6 @@ const reviewSchema = new mongoose.Schema({
     required: true,
     maxlength: 1000, // Add character limit
   },
-  status: {
-    type: String,
-    enum: ["pending", "approved", "rejected"],
-    default: "pending",
-  },
   type: {
     type: String,
     enum: ["bug", "feature_request", "general_feedback", "accuracy_issue"],

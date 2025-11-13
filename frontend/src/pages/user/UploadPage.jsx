@@ -7,6 +7,7 @@ import { getToken } from "../../utils/authUtil";
 import notify from "../../components/user/Toast";
 import Navbar from "../../components/user/layouts/Navbar";
 import NamingModal from "../../components/user/Modal";
+import FeedbackModal from "../../components/user/FeedbackModal";
 
 function UploadPage() {
   const navigate = useNavigate();
@@ -24,6 +25,7 @@ function UploadPage() {
   const [cameraError, setCameraError] = useState("");
   const [cameraLoading, setCameraLoading] = useState(false);
   const [recentAnalysis, setRecentAnalysis] = useState([]);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
   const videoRef = useRef(null);
   const streamRef = useRef(null);
@@ -37,8 +39,8 @@ function UploadPage() {
         },
       })
       .then((response) => {
-        setRecentAnalysis(response.data.result)
-        console.log(response.data.result)
+        setRecentAnalysis(response.data.result);
+        console.log(response.data.result);
       })
       .catch((error) => console.log(error));
   }, []);
@@ -346,6 +348,24 @@ function UploadPage() {
       });
   }
 
+  async function handleFeedback(data) {
+    axios
+      .post(
+        `${import.meta.env.VITE_APP_API}api/v1/review`,
+        { data },
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
+      .then((response) => {
+        console.log(response);
+        notify("success", "Successfully submitted your feedback");
+      })
+      .catch((error) => console.log(error));
+  }
+
   const renderScrewDetails = (resultData) => {
     if (!resultData?.success || !resultData.result) {
       return (
@@ -492,8 +512,14 @@ function UploadPage() {
           onClose={() => setShowModal(false)}
           currValue={`Analysis-${Date.now()}`}
           onSubmit={handleSave}
-          alreadySaved={false}
-        ></NamingModal>
+          alreadySaved={false}></NamingModal>
+      )}
+      {showFeedbackModal && (
+        <FeedbackModal
+          isOpen={showFeedbackModal}
+          onClose={() => setShowFeedbackModal(false)}
+          analysisId={storedData._id || ''}
+          onSubmit={handleFeedback}></FeedbackModal>
       )}
 
       {/* Hidden canvas for image capture */}
@@ -515,8 +541,7 @@ function UploadPage() {
                 onClick={() => {
                   setUploadMethod("file");
                   if (cameraActive) stopCamera();
-                }}
-              >
+                }}>
                 📁 File Upload
               </button>
               <button
@@ -524,8 +549,7 @@ function UploadPage() {
                   uploadMethod === "camera" ? "active" : ""
                 }`}
                 onClick={() => setUploadMethod("camera")}
-                disabled={cameraLoading}
-              >
+                disabled={cameraLoading}>
                 {cameraLoading ? "🔄 Starting..." : "📷 Use Camera"}
               </button>
             </div>
@@ -542,16 +566,14 @@ function UploadPage() {
               <label
                 className="upload-box"
                 onDrop={handleDrop}
-                onDragOver={handleDragOver}
-              >
+                onDragOver={handleDragOver}>
                 <div className="upload-icon">
                   <svg
                     width="48"
                     height="48"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="currentColor"
-                  >
+                    stroke="currentColor">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                     <polyline points="17 8 12 3 7 8" />
                     <line x1="12" y1="3" x2="12" y2="15" />
@@ -577,8 +599,7 @@ function UploadPage() {
                   style={{
                     display: cameraActive ? "block" : "none",
                     position: "relative",
-                  }}
-                >
+                  }}>
                   <video
                     ref={videoRef}
                     autoPlay
@@ -645,8 +666,7 @@ function UploadPage() {
               <div className="mode-buttons">
                 <button
                   className={`mode-btn ${mode === "classify" ? "active" : ""}`}
-                  onClick={() => setMode("classify")}
-                >
+                  onClick={() => setMode("classify")}>
                   <span className="mode-icon">🔍</span>
                   <span className="mode-text">
                     <strong>Classification</strong>
@@ -655,8 +675,7 @@ function UploadPage() {
                 </button>
                 <button
                   className={`mode-btn ${mode === "count" ? "active" : ""}`}
-                  onClick={() => setMode("count")}
-                >
+                  onClick={() => setMode("count")}>
                   <span className="mode-icon">🔢</span>
                   <span className="mode-text">
                     <strong>Counting</strong>
@@ -670,8 +689,7 @@ function UploadPage() {
             <button
               onClick={handleAnalyze}
               disabled={loading || !selectedFile}
-              className="analyze-btn"
-            >
+              className="analyze-btn">
               {loading ? (
                 <>
                   <div className="btn-spinner"></div>
@@ -726,12 +744,16 @@ function UploadPage() {
                 <button
                   onClick={() => setShowModal(true)}
                   disabled={loadingSave}
-                  className="save-btn"
-                >
+                  className="save-btn">
                   {loadingSave ? "Saving..." : "💾 Save Result"}
                 </button>
                 <button className="download-btn" onClick={handleDownload}>
                   Download Report
+                </button>
+                <button
+                  className="download-btn"
+                  onClick={() => setShowFeedbackModal(true)}>
+                  Submit a feedback
                 </button>
               </div>
             )}

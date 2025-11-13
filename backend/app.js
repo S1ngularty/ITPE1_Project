@@ -2,7 +2,7 @@ const express = require("express");
 const App = express();
 const cors = require("cors");
 
-const { auth, user, analyze, screw,admin } = require("./routes/index");
+const { auth, user, analyze, screw, admin, review } = require("./routes/index");
 
 App.use(cors());
 App.use(express.json({ limit: "50mb" }));
@@ -14,5 +14,7 @@ App.use("/api/v1", user);
 App.use("/api/v1/", analyze);
 App.use("/api/v1", screw);
 App.use("/api/v1", admin);
+App.use("/api/v1", review);
+
 
 module.exports = App;
