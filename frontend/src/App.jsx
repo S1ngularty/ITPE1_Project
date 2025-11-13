@@ -19,6 +19,7 @@ import Dashboard from "./pages/user/Dashboard.jsx";
 import AdminDashboard from "./pages/admin/Dashboard.jsx";
 import "./index.css";
 import UserManagement from "./pages/admin/UserManagement.jsx";
+import FeedbackManagement from "./pages/admin/FeedbackManagement.jsx";
 
 function App() {
   return (
@@ -26,7 +27,7 @@ function App() {
       <ToastContainer />
       <Router>
         <Routes>
-          <Route path="/" element={<Home/>}></Route>
+          <Route path="/" element={<Home />}></Route>
           <Route path="/login" element={<Login />}></Route>
           <Route path="/register" element={<Register />}></Route>
           <Route
@@ -73,8 +74,8 @@ function App() {
             path="/admin/dashboard"
             element={<AdminDashboard></AdminDashboard>}></Route>
           <Route
-            path="/admin/users"
-            element={<UserManagement></UserManagement>}></Route>
+            path="/admin/feedback"
+            element={<FeedbackManagement></FeedbackManagement>}></Route>
         </Routes>
       </Router>
     </>

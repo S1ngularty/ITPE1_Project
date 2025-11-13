@@ -18,7 +18,7 @@ const AdminSidebar = () => {
       id: "feedbacks",
       label: "Review Feedbacks",
       icon: "💬",
-      path: "/admin/feedbacks"
+      path: "/admin/feedback"
     },
   ];
 
