@@ -12,13 +12,13 @@ const AdminSidebar = () => {
       id: "dashboard",
       label: "Dashboard",
       icon: "📊",
-      path: "/admin/dashboard"
+      path: "/admin/dashboard",
     },
     {
       id: "feedbacks",
       label: "Review Feedbacks",
       icon: "💬",
-      path: "/admin/feedback"
+      path: "/admin/feedback",
     },
   ];
 
@@ -35,7 +35,7 @@ const AdminSidebar = () => {
   };
 
   return (
-    <div className={`admin-sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+    <div className={`admin-sidebar ${isCollapsed ? "collapsed" : ""}`}>
       {/* Sidebar Header */}
       <div className="sidebar-header">
         {!isCollapsed && (
@@ -48,7 +48,7 @@ const AdminSidebar = () => {
           </div>
         )}
         <button className="sidebar-toggle" onClick={toggleSidebar}>
-          {isCollapsed ? '➡️' : '⬅️'}
+          {isCollapsed ? "➡️" : "⬅️"}
         </button>
       </div>
 
@@ -58,9 +58,8 @@ const AdminSidebar = () => {
           {menuItems.map((item) => (
             <li key={item.id} className="nav-item">
               <div
-                className={`nav-link ${isActive(item.path) ? 'active' : ''}`}
-                onClick={() => handleNavigation(item.path)}
-              >
+                className={`nav-link ${isActive(item.path) ? "active" : ""}`}
+                onClick={() => handleNavigation(item.path)}>
                 <span className="nav-icon">{item.icon}</span>
                 {!isCollapsed && (
                   <span className="nav-label">{item.label}</span>
@@ -83,21 +82,15 @@ const AdminSidebar = () => {
           </div>
         )}
         <div className="sidebar-actions">
-          <button 
-            className="sidebar-action-btn"
-            onClick={() => navigate('/')}
-            title="Back to Main Site"
-          >
-            🏠 {!isCollapsed && <span>Main Site</span>}
-          </button>
-          <button 
+          <button
             className="sidebar-action-btn logout-btn"
             onClick={() => {
               // Handle logout
-              console.log('Logout clicked');
+              localStorage.clear();
+              navigate("/login");
+              console.log("Logout clicked");
             }}
-            title="Logout"
-          >
+            title="Logout">
             🚪 {!isCollapsed && <span>Logout</span>}
           </button>
         </div>

@@ -23,6 +23,7 @@ function Login() {
           localStorage.setItem("rememberMe", "true");
         }
         notify("success", "Login successfully");
+        if(response.data.role ==='admin') return navigate('/admin/dashboard')
         navigate("/home");
       })
       .catch((err) => {

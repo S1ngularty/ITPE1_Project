@@ -8,7 +8,7 @@ exports.login = async (req, res) => {
     console.log(email, password);
     if (!password || !email)
       return res.status(500).json("please provide input on the fields");
-    const user = await User.findOne({ email }).select("+password").exec();
+    const user = await User.findOne({ email }).select("+password +role").exec();
     if (!user) return res.status(500).json("email not found");
     const match = await bcrypt.compare(password, user.password);
 
@@ -27,7 +27,7 @@ exports.login = async (req, res) => {
         .status(500)
         .json("Couldnt generate a token, Please try again!");
 
-    return res.status(200).json({ token, email });
+    return res.status(200).json({ token, email,role:user.role });
   } catch (error) {
     console.log(error)
     return res.status(500).json(error.message);
