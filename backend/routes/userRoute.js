@@ -6,7 +6,7 @@ const authMiddleware = require("../middleware/auth");
 const userController = require("../controllers/userController");
 const userActivityController= require("../controllers/userActivityController")
 // router.get("/user",authMiddleware.verifyToken, userController.userList);
-router.get("/user", authMiddleware.verifyToken, authMiddleware.checkRole('admin'), userController.getUser);
+router.get("/user", authMiddleware.verifyToken, userController.getUser);
 router.post("/user", authMiddleware.verifyToken, userController.update);
 router.patch(
   "/user/updatePassword",
