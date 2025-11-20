@@ -2,3 +2,5 @@ ITPE1 Project
 from linux
 git config --global user.name
 git config --global user.email
+
+console.log("system defended")
