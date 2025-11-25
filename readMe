@@ -4,3 +4,6 @@ git config --global user.name
 git config --global user.email
 
 console.log("system defended")
+while(systemIsInProgress){
+    console.log("system is still in progress and adding more features.")
+}
