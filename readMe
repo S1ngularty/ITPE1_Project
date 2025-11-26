@@ -7,3 +7,12 @@ console.log("system defended")
 while(systemIsInProgress){
     console.log("system is still in progress and adding more features.")
 }
+
+
+some(), an array method
+-some method is an array object property use test each element on its array array if its satisfies a specific condition.
+some() has two parameter, first is the callback function, the callback function is the assigned to check each element satisfies the condition,
+it only return a boolean (true or false). and the callback function also have a 3 parameter (element,index,array).
+The second parameter of this method is thisArgs, this parameter is optional, most dev dont use it, but this parameter represent the value as this keyword
+inside the block statement. So to summarize this function usage, it is used for checking or condition to check the array depending 
+on the condition, given to the callback function.
